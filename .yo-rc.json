@@ -1,0 +1,21 @@
+{
+  "generator-template-ui5-project": {
+    "projectname": "TaskManagementTool",
+    "namespaceUI5": "com.ravi.dissertation",
+    "platform": "Static webserver",
+    "viewtype": "XML",
+    "ui5libs": "Content delivery network (SAPUI5)",
+    "newdir": true,
+    "namespaceURI": "com/ravi/dissertation",
+    "opa5pos": [
+      "Main"
+    ],
+    "opa5Journeys": [
+      "Main"
+    ],
+    "uimodules": [
+      "uimodule"
+    ],
+    "setupCompleted": true
+  }
+}
