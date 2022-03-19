@@ -2,15 +2,15 @@
   "name": "TaskManagementTool",
   "version": "0.0.1",
   "scripts": {
-    "start": "ui5 serve --config=uimodule/ui5.yaml  --open index.html",
-    "build:ui": "run-s  build:uimodule",
+    "start": "ui5 serve --config=ui5.yaml  --open index.html",
+    "build:ui": "run-s  build",
     "test": "run-s lint karma",
     "karma-ci": "karma start karma-ci.conf.js",
     "clearCoverage": "shx rm -rf coverage",
     "karma": "run-s clearCoverage karma-ci",
     "lint": "eslint .",
-    "serve:uimodule": "ui5 serve --config=uimodule/ui5.yaml",
-    "build:uimodule": "ui5 build --config=uimodule/ui5.yaml --clean-dest --dest uimodule/dist --include-task=generateManifestBundle"
+    "serve:uimodule": "ui5 serve --config=ui5.yaml",
+    "build:uimodule": "ui5 build --config=ui5.yaml --clean-dest --dest dist --include-task=generateManifestBundle"
   },
   "devDependencies": {
     "shx": "^0.3.3",

@@ -14,7 +14,7 @@
       "Main"
     ],
     "uimodules": [
-      "uimodule"
+      "webapp"
     ],
     "setupCompleted": true
   }
