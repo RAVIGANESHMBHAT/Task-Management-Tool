@@ -18,6 +18,18 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/Device"], function (JSONMo
 
       let oModel = new JSONModel(oUserModel);
       return oModel;
-    }
+    },
+
+    createProjectModel: function () {
+      let oProjectModel = {
+        projectId: Date.now().toString(),
+        generatedProjectNo: Math.floor(Math.random() * 90000) + 10000,
+        projectCode: "",
+        projectName: "",
+      }
+
+      let oModel = new JSONModel(oProjectModel);
+      return oModel;
+    },
   };
 });

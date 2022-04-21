@@ -178,7 +178,27 @@ sap.ui.define([
 		 * Method to open project dialog
 		 * @public
 		 */
-
+    onPressNewProjectButton: function () {
+			var oView = this.getView();
+			//create a new model to fetch the data from dialog
+			this.oComponent.setModel(models.createProjectModel(), "createProjectModel");
+			// create dialog lazily
+			if (!this.createProjectDialog) {
+				this.createProjectDialog = Fragment.load({
+					id: oView.getId(),
+					name: "com.ravi.dissertation.TaskManagementTool.fragments.CreateProject",
+					controller: this
+				}).then(function (oDialog) {
+					// connect dialog to the root view of this component (models, lifecycle)
+					oView.addDependent(oDialog);
+					return oDialog;
+				});
+				this._aProjects = []; //initialize projects array and later push it to a model
+			}
+			this.createProjectDialog.then(function (oDialog) {
+				oDialog.open();
+			});
+		},
 
 		/**
 		 * Method to close create issue dialog
