@@ -1,0 +1,145 @@
+<mvc:View displayBlock="true" controllerName="com.ravi.dissertation.TaskManagementTool.controller.Detail" height="100%"
+          xmlns="sap.m" xmlns:f="sap.f"
+          xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
+          xmlns:fb="sap.ui.comp.filterbar">
+
+  <f:DynamicPage id="dynamicPageId" toggleHeaderOnTitleClick="false">
+    <!-- DynamicPage Title -->
+    <f:title>
+      <f:DynamicPageTitle>
+        <f:heading>
+          <Title text="Issues Dashboard"/>
+        </f:heading>
+        <f:actions>
+          <ToolbarSpacer/>
+          <Button
+            text="New Project"
+            type="Emphasized"
+            press="onPressNewProjectButton"/>
+        </f:actions>
+      </f:DynamicPageTitle>
+    </f:title>
+
+    <!-- DynamicPage Header -->
+    <f:header>
+      <f:DynamicPageHeader pinnable="true">
+        <f:content>
+          <fb:FilterBar id="issuesListFilterBarId" reset="onReset" search="onSearchIssuesList" useToolbar="true" showGoOnFB="false" showClearOnFB="true" clear="clearFilters"
+                        advancedMode="false" showFilterConfiguration="false">
+            <fb:filterItems>
+              <fb:FilterItem name="A" label="Project Name">
+                <fb:control>
+                  <Select
+                    id="slName"
+                    forceSelection="true"
+                    change="onSelectChange"
+                    items="{
+                        path: '/ProductNames'
+                    }">
+                    <core:Item key="{key}" text="{name}"/>
+                  </Select>
+                </fb:control>
+              </fb:FilterItem>
+              <fb:FilterItem name="B" label="Issue Type">
+                <fb:control>
+                  <Select
+                    id="slCategory"
+                    change="onSelectChange"
+                    forceSelection="true"
+                    items="{
+                      path: '/ProductCategories'
+                   }">
+                    <core:Item key="{key}" text="{name}"/>
+                  </Select>
+                </fb:control>
+              </fb:FilterItem>
+              <fb:FilterItem name="C" label="Priority">
+                <fb:control>
+                  <MultiComboBox
+                    id="slSupplierName"
+                    change="onSelectChange"
+                    >
+                    <core:Item key="low" text="Low"/>
+                    <core:Item key="medium" text="Medium"/>
+                    <core:Item key="high" text="High"/>
+                  </MultiComboBox>
+                </fb:control>
+              </fb:FilterItem>
+              <fb:FilterItem name="D" label="Status">
+                <fb:control>
+                  <MultiComboBox
+                    id="slCategory1"
+                    change="onSelectChange"
+                    >
+                    <core:Item key="open" text="Open"/>
+                    <core:Item key="in_progress" text="In Progress"/>
+                    <core:Item key="blocked" text="Blocked"/>
+                    <core:Item key="completed" text="Completed"/>
+                  </MultiComboBox>
+                </fb:control>
+              </fb:FilterItem>
+            </fb:filterItems>
+          </fb:FilterBar>
+        </f:content>
+      </f:DynamicPageHeader>
+    </f:header>
+    <!-- DynamicPage Content -->
+    <f:content>
+      <Table id="tasksTable" inset="false" items="{path: 'masterTaskManagementModel>/'}"
+             noDataText="No issues created." class="sapFDynamicPageAlignContent" width="auto" sticky="ColumnHeaders,HeaderToolbar">
+        <headerToolbar>
+          <OverflowToolbar>
+            <Title text="Issues List (0)" level="H2"/>
+            <ToolbarSpacer/>
+<!--            <SearchField search="onSearch" placeholder="Search by Project Code" width="17.5rem"/>-->
+<!--            <Button type="Emphasized" text="Create Project" press="onCreateProject"/>-->
+            <Button id="createTaskBtn" type="Transparent" text="Create Issue" press="onCreateIssue"
+                    tooltip="Create a new issue"/>
+            <Button id="exportBtn" icon="sap-icon://excel-attachment" press="onExport"
+                    tooltip="Export table data into excel file."/>
+          </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+          <Column width="12em">
+            <Text text="Issue"/>
+          </Column>
+          <Column hAlign="Begin">
+            <Text text="Type"/>
+          </Column>
+          <Column hAlign="Begin">
+            <Text text="Priority"/>
+          </Column>
+          <Column hAlign="Begin">
+            <Text text="Assignee"/>
+          </Column>
+          <Column hAlign="Begin">
+            <Text text="Status"/>
+          </Column>
+        </columns>
+        <items>
+          <ColumnListItem type="Navigation" press="onListItemPress">
+            <cells>
+              <ObjectIdentifier
+                title="{masterTaskManagementModel>projectCode}"
+                text="{masterTaskManagementModel>taskTitle}"/>
+              <Text text="{masterTaskManagementModel>taskType}"/>
+              <ObjectStatus text="{masterTaskManagementModel>taskPriority}"
+                            state="{path: 'masterTaskManagementModel>taskPriority1', formatter:'.formatter.formatTaskPriority'}"/>
+              <Text text="{masterTaskManagementModel>taskAssigneeName}"/>
+              <ObjectStatus text="{masterTaskManagementModel>taskStatus}"
+                            state="{path: 'masterTaskManagementModel>taskStatus', formatter:'.formatter.formatTaskState'}"/>
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </f:content>
+    <!-- DynamicPage Footer -->
+    <f:footer>
+      <OverflowToolbar>
+        <ToolbarSpacer/>
+        <Button type="Accept" text="Accept"/>
+        <Button type="Reject" text="Reject"/>
+      </OverflowToolbar>
+    </f:footer>
+  </f:DynamicPage>
+</mvc:View>

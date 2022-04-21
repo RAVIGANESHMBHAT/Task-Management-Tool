@@ -118,11 +118,22 @@
           "target": [
             "login"
           ]
+        },
+        {
+          "pattern": "detail/{layout}/{userName}",
+          "name": "detail",
+          "target": [
+            "detail"
+          ]
         }
       ],
       "targets": {
         "login": {
           "viewName": "Login",
+          "controlAggregation": "beginColumnPages"
+        },
+        "detail": {
+          "viewName": "Detail",
           "controlAggregation": "beginColumnPages"
         }
       }
