@@ -39,9 +39,9 @@ sap.ui.define([
 
 			this._createReportFragment = {}; //initialize report fragment
 
-			this.byId("createTaskBtn").setEnabled(false); //initially disable create task button and enable after creating one project
+			//this.byId("createTaskBtn").setEnabled(false); //initially disable create task button and enable after creating one project
 
-			this.byId("exportBtn").setEnabled(false);
+			//this.byId("exportBtn").setEnabled(false);
 
       const oModel = this.getOwnerComponent().getModel("masterTaskManagementModel");
       oModel.setData([
@@ -161,7 +161,7 @@ sap.ui.define([
 			if (!this.createIssueDialog) {
 				this.createIssueDialog = Fragment.load({
 					id: oView.getId(),
-					name: "com.vistex.taskmanagement.fragments.CreateIssue",
+					name: "com.ravi.dissertation.TaskManagementTool.fragments.CreateIssue",
 					controller: this //bind controller to fragment for eventing
 				}).then(function (oDialog) {
 					// connect dialog to the root view of this component (models, lifecycle)
