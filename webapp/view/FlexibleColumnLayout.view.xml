@@ -1,0 +1,21 @@
+<mvc:View xmlns="sap.f" xmlns:m="sap.m" xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+	controllerName="com.ravi.dissertation.TaskManagementTool.controller.FlexibleColumnLayout" height="100%">
+	<m:Page>
+		<m:customHeader>
+			<ShellBar title="Task Management Tool " secondTitle="Manage your tasks with ease" homeIcon="" showCopilot="false" showSearch="true"
+				showNotifications="true" showProductSwitcher="true" showNavButton="{= ${/layout} === 'EndColumnFullScreen'}" notificationsNumber="0">
+				<menu>
+					<m:Menu>
+						<m:MenuItem text="Utilities"/>
+					</m:Menu>
+				</menu>
+				<profile>
+					<m:Avatar initials="UI"/>
+				</profile>
+			</ShellBar>
+		</m:customHeader>
+			<m:App class="myAppDemoWT">
+				<FlexibleColumnLayout id="fcl" stateChange="onStateChanged" layout="{/layout}" backgroundDesign="Solid"/>
+			</m:App>
+		</m:Page>
+</mvc:View>
