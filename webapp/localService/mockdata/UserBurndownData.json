@@ -1,0 +1,74 @@
+[
+  {
+    "burndown": [
+      {
+        "username": "Vaibhav",
+        "tasks": [
+          {
+            "tasktype": "Story",
+            "assignedno": "3"
+          },
+          {
+            "tasktype": "Bug",
+            "assignedno": "2"
+          },
+          {
+            "tasktype": "Task",
+            "assignedno": "2"
+          }
+        ]
+      },
+      {
+        "username": "Abhi",
+        "tasks": [
+          {
+            "tasktype": "Story",
+            "assignedno": "5"
+          },
+          {
+            "tasktype": "Bug",
+            "assignedno": "3"
+          },
+          {
+            "tasktype": "Task",
+            "assignedno": "2"
+          }
+        ]
+      },
+      {
+        "username": "Ashok",
+        "tasks": [
+          {
+            "tasktype": "Story",
+            "assignedno": "2"
+          },
+          {
+            "tasktype": "Bug",
+            "assignedno": "1"
+          },
+          {
+            "tasktype": "Task",
+            "assignedno": "1"
+          }
+        ]
+      },
+      {
+        "username": "Dillon",
+        "tasks": [
+          {
+            "tasktype": "Story",
+            "assignedno": "2"
+          },
+          {
+            "tasktype": "Bug",
+            "assignedno": "8"
+          },
+          {
+            "tasktype": "Task",
+            "assignedno": "0"
+          }
+        ]
+      }
+    ]
+  }
+]

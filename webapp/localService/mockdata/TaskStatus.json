@@ -1,0 +1,14 @@
+[
+    {
+      "name": "New",
+      "taskStatusCode": 0
+    },
+    {
+      "name": "In Progress",
+      "taskStatusCode": 1
+    },
+    {
+      "name": "Completed",
+      "taskStatusCode": 2
+    }
+  ]

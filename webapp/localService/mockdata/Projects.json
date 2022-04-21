@@ -1,0 +1,16 @@
+[
+	{
+		"projectId": 1,
+		"projectCode": "DM",
+		"projectName": "Digital Manufacturing"
+	}, {
+		"projectId": 2,
+		"projectCode": "CO",
+		"projectName": "Cloud Operations"
+	}, {
+		"projectId": 3,
+		"projectCode": "GS",
+		"projectName": "Globalization Services"
+	}
+	
+]

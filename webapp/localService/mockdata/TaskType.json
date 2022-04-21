@@ -1,0 +1,17 @@
+ [
+    {
+      "name": "Bug",
+      "taskTypeCode": 0,
+      "icon": "sap-icon://quality-issue"
+    },
+    {
+      "name": "Task",
+      "taskTypeCode": 1,
+      "icon": "sap-icon://activities"
+    },
+    {
+      "name": "Story",
+      "taskTypeCode": 2,
+      "icon": "sap-icon://work-history"
+    }
+  ]

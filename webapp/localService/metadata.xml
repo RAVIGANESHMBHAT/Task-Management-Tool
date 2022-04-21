@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+	<edmx:DataServices xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" m:DataServiceVersion="1.0">
+		<Schema Namespace="TaskManagementService" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
+			xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+			<EntityType Name="Users">
+				<Key>
+					<PropertyRef Name="id"/>
+				</Key>
+				<Property Name="id" Type="Edm.Int32" Nullable="false"/>
+				<Property Name="name" Type="Edm.String"/>
+				<Property Name="role" Type="Edm.String"/>
+			</EntityType>
+			
+				<EntityType Name="Projects">
+				<Key>
+					<PropertyRef Name="projectId"/>
+				</Key>
+				<Property Name="projectId" Type="Edm.Int32" Nullable="false"/>
+				<Property Name="projectCode" Type="Edm.String"/>
+				<Property Name="projectName" Type="Edm.String"/>
+			</EntityType>
+			
+			<EntityType Name="TaskStatus">
+				<Key>
+					<PropertyRef Name="taskStatusCode"/>
+				</Key>
+				<Property Name="name" Type="Edm.String" MaxLength="255"/>
+				<Property Name="descr" Type="Edm.String" MaxLength="1000"/>
+				<Property Name="taskStatusCode" Type="Edm.Int32" Nullable="false"/>
+			</EntityType>
+			<EntityType Name="TaskPriority">
+				<Key>
+					<PropertyRef Name="taskPrioCode"/>
+				</Key>
+				<Property Name="name" Type="Edm.String" MaxLength="255"/>
+				<Property Name="descr" Type="Edm.String" MaxLength="1000"/>
+				<Property Name="taskPrioCode" Type="Edm.Int32" Nullable="false"/>
+			</EntityType>
+			<EntityType Name="TaskType">
+				<Key>
+					<PropertyRef Name="taskTypeCode"/>
+				</Key>
+				<Property Name="name" Type="Edm.String" MaxLength="255"/>
+				<Property Name="descr" Type="Edm.String" MaxLength="1000"/>
+				<Property Name="taskTypeCode" Type="Edm.Int32" Nullable="false"/>
+			</EntityType>
+			<EntityContainer Name="NavigationEntities" p7:LazyLoadingEnabled="true" m:IsDefaultEntityContainer="true"
+				xmlns:p7="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+				<EntitySet Name="Users" EntityType="TaskManagementService.Users"/>
+				<EntitySet Name="Projects" EntityType="TaskManagementService.Projects"/>
+				<EntitySet Name="TaskStatus" EntityType="TaskManagementService.TaskStatus"/>
+				<EntitySet Name="TaskPriority" EntityType="TaskManagementService.TaskPriority"/>
+				<EntitySet Name="TaskType" EntityType="TaskManagementService.TaskType"/>
+			</EntityContainer>
+		</Schema>
+	</edmx:DataServices>
+</edmx:Edmx>
