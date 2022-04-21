@@ -18,11 +18,11 @@
           "localUri": "localService/metadata.xml"
         }
       },
-      "userModel":{
+      "userModel": {
         "uri": "localService/mockdata/Users.json",
         "type": "JSON"
       },
-      "reportModel":{
+      "reportModel": {
         "uri": "localService/mockdata/UserBurndownData.json",
         "type": "JSON"
       }
@@ -113,17 +113,17 @@
       },
       "routes": [
         {
-          "name": "RouteMainView",
-          "pattern": "RouteMainView",
-          "target": ["TargetMainView"]
+          "pattern": ":layout:",
+          "name": "login",
+          "target": [
+            "login"
+          ]
         }
       ],
       "targets": {
-        "TargetMainView": {
-          "viewType": "XML",
-          "viewLevel": 1,
-          "viewId": "idAppControl",
-          "viewName": "MainView"
+        "login": {
+          "viewName": "Login",
+          "controlAggregation": "beginColumnPages"
         }
       }
     }
