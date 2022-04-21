@@ -98,7 +98,7 @@ sap.ui.define([
 			if (!this.registerUserDialog) {
 				this.registerUserDialog = Fragment.load({
 					id: oView.getId(),
-					name: "com.vistex.taskmanagement.fragments.RegisterUser",
+					name: "com.ravi.dissertation.TaskManagementTool.fragments.RegisterUser",
 					controller: this
 				}).then(function (oDialog) {
 					// connect dialog to the root view of this component (models, lifecycle)

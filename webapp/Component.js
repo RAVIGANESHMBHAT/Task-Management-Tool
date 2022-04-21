@@ -35,7 +35,7 @@ sap.ui.define(
         this.setModel(oModel);
 
         // set the device model
-        this.setModel(models.createDeviceModel(), "device");
+        //this.setModel(models.createDeviceModel(), "device");
       },
 
       getHelper: function () {
