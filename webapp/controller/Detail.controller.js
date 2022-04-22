@@ -91,10 +91,207 @@ sap.ui.define([
         oFilterBar.setBasicSearch(oBasicSearch);
       }
       sap.ui.core.BusyIndicator.hide(1);
+      this.getModel("issuesFilterModel").setProperty("/issuesListCount", 4);
 		},
 
     handleIssuesListSearch: function(oEvent) {
-      console.log("Search triggered");
+      var oIssuesFilterModel = this.getModel("issuesFilterModel");
+      const sSearchValue = oEvent ? oEvent.getSource().getProperty("value") : "";
+
+      if (oIssuesFilterModel.getProperty("/filterBarData") === undefined) {
+        const oFilterBarData = {};
+        oFilterBarData["searchValue"] = sSearchValue;
+        oIssuesFilterModel.setProperty("/filterBarData", oFilterBarData);
+      } else {
+        oIssuesFilterModel.setProperty("/filterBarData/searchValue", sSearchValue);
+      }
+      this.onFiltersSelectionChange(oEvent);
+    },
+    onProjectIdFiltersSelectionChange: function(oEvent) {
+      oEvent.source = "Project_Id_ComboBox";
+      this.onFiltersSelectionChange(oEvent);
+    },
+
+    onIssueTypeFiltersSelectionChange: function(oEvent) {
+      oEvent.source = "Issue_Type_ComboBox";
+      this.onFiltersSelectionChange(oEvent);
+    },
+
+    onPriorityFiltersSelectionChange: function(oEvent) {
+      oEvent.source = "Priority_ComboBox";
+      this.onFiltersSelectionChange(oEvent);
+    },
+
+    onStatusFiltersSelectionChange: function(oEvent) {
+      oEvent.source = "Status_ComboBox";
+      this.onFiltersSelectionChange(oEvent);
+    },
+
+    handleSelectionFinish: function (oEvent) {
+      var aSelectedItems = oEvent ? oEvent.getParameter("selectedItems") : [];
+      var aItems = [];
+      for (var i = 0; i < aSelectedItems.length; i++) {
+        aItems.push(aSelectedItems[i].getText());
+      }
+      return aItems;
+    },
+
+    onFiltersSelectionChange: function (oEvent) {
+      const sSourceControl = oEvent.source;
+
+      const oIssuesFilterModel = this.getModel("issuesFilterModel");
+      var oFilterBarData;
+      if (sSourceControl === "Project_Id_ComboBox") {
+        let aSelectedProjectIds = this.handleSelectionFinish(oEvent);
+        if (oIssuesFilterModel.getProperty("/filterBarData") === undefined) {
+          oFilterBarData = {};
+          oFilterBarData["projectIdFilters"] = aSelectedProjectIds;
+          oIssuesFilterModel.setProperty("/filterBarData", oFilterBarData);
+        } else {
+          oIssuesFilterModel.setProperty("/filterBarData/projectIdFilters", aSelectedProjectIds);
+        }
+      } else if (sSourceControl === "Issue_Type_ComboBox") {
+        let aSelectedIssueTypes = this.handleSelectionFinish(oEvent);
+        if (oIssuesFilterModel.getProperty("/filterBarData") === undefined) {
+          oFilterBarData = {};
+          oFilterBarData["issueTypeFilters"] = aSelectedIssueTypes;
+          oIssuesFilterModel.setProperty("/filterBarData", oFilterBarData);
+        } else {
+          oIssuesFilterModel.setProperty("/filterBarData/issueTypeFilters", aSelectedIssueTypes);
+        }
+      } else if (sSourceControl === "Priority_ComboBox") {
+        let aSelectedPriorities = this.handleSelectionFinish(oEvent);
+        if (oIssuesFilterModel.getProperty("/filterBarData") === undefined) {
+          oFilterBarData = {};
+          oFilterBarData["priorityFilters"] = aSelectedPriorities;
+          oIssuesFilterModel.setProperty("/filterBarData", oFilterBarData);
+        } else {
+          oIssuesFilterModel.setProperty("/filterBarData/priorityFilters", aSelectedPriorities);
+        }
+      } else if (sSourceControl === "Status_ComboBox") {
+        let aSelectedStatuses = this.handleSelectionFinish(oEvent);
+        if (oIssuesFilterModel.getProperty("/filterBarData") === undefined) {
+          oFilterBarData = {};
+          oFilterBarData["statusFilters"] = aSelectedStatuses;
+          oIssuesFilterModel.setProperty("/filterBarData", oFilterBarData);
+        } else {
+          oIssuesFilterModel.setProperty("/filterBarData/statusFilters", aSelectedStatuses);
+        }
+      }
+      var oIssuesTable = this.byId("tasksTable"),
+        oTableBinding = oIssuesTable.getBinding('items'),
+        aFilterContent = this.constructFilters();
+
+      oTableBinding.filter(new Filter({
+        filters: aFilterContent,
+        and: true
+      }));
+      //oIssuesFilterModel.setProperty("/eventWiseScholarsListCount", oTableBinding.getLength());
+      oIssuesFilterModel.setProperty("/issuesListCount", oTableBinding.getLength());
+      var oExportDataModel = this.getModel("tableExportModel");
+      var aData = (oIssuesTable.getItems() || []).map(function (oItem) {
+        return oItem.getBindingContext("masterTaskManagementModel").getObject();
+      });
+       oExportDataModel.setData(aData);
+    },
+
+    constructFilters: function() {
+        let oIssuesFilterModel = this.getModel("issuesFilterModel"),
+        sSearchValue = oIssuesFilterModel.getProperty("/filterBarData/searchValue"),
+        aProjectIdFilters = oIssuesFilterModel.getProperty("/filterBarData/projectIdFilters"),
+        aIssueTypeFilters = oIssuesFilterModel.getProperty("/filterBarData/issueTypeFilters"),
+        aIssuePriorityFilters = oIssuesFilterModel.getProperty("/filterBarData/priorityFilters"),
+        aIssueStatusFilters = oIssuesFilterModel.getProperty("/filterBarData/statusFilters"),
+        aCombinedFilters = [];
+
+      if (sSearchValue && sSearchValue !== "") {
+        var oSearchFilter0 = new Filter("taskAssigneeName", FilterOperator.Contains, sSearchValue),
+          oSearchFilter1 = new Filter("projectCode", FilterOperator.Contains, sSearchValue),
+          oSearchFilter2 = new Filter("taskTitle", FilterOperator.Contains, sSearchValue),
+          oAllSearchFilters = new Filter({
+            filters: [oSearchFilter0, oSearchFilter1, oSearchFilter2],
+            and: false
+          });
+        aCombinedFilters.push(oAllSearchFilters);
+      }
+
+      if (aProjectIdFilters && aProjectIdFilters.length > 0) {
+        var aAllBatchFilters = [];
+        for (var i = 0; i < aProjectIdFilters.length; i++) {
+          aAllBatchFilters.push(new Filter("projectCode", FilterOperator.EQ, aProjectIdFilters[i]));
+        }
+        var oAllBatchFilters = new Filter({
+          filters: aAllBatchFilters,
+          and: false
+        });
+        aCombinedFilters.push(oAllBatchFilters);
+      }
+
+      if (aIssueTypeFilters && aIssueTypeFilters.length > 0) {
+        var aAllBatchFilters = [];
+        for (var i = 0; i < aIssueTypeFilters.length; i++) {
+          aAllBatchFilters.push(new Filter("taskType", FilterOperator.EQ, aIssueTypeFilters[i]));
+        }
+        var oAllBatchFilters = new Filter({
+          filters: aAllBatchFilters,
+          and: false
+        });
+        aCombinedFilters.push(oAllBatchFilters);
+      }
+
+      if (aIssuePriorityFilters && aIssuePriorityFilters.length > 0) {
+        var aAllBatchFilters = [];
+        for (var i = 0; i < aIssuePriorityFilters.length; i++) {
+          aAllBatchFilters.push(new Filter("taskPriority", FilterOperator.EQ, aIssuePriorityFilters[i]));
+        }
+        var oAllBatchFilters = new Filter({
+          filters: aAllBatchFilters,
+          and: false
+        });
+        aCombinedFilters.push(oAllBatchFilters);
+      }
+
+      if (aIssueStatusFilters && aIssueStatusFilters.length > 0) {
+        var aAllStatusFilters = [];
+        for (var i = 0; i < aIssueStatusFilters.length; i++) {
+          aAllStatusFilters.push(new Filter("taskStatus", FilterOperator.EQ, aIssueStatusFilters[i]));
+        }
+        var oAllStatusFilters = new Filter({
+          filters: aAllStatusFilters,
+          and: false
+        });
+        aCombinedFilters.push(oAllStatusFilters);
+      }
+      return aCombinedFilters;
+    },
+
+    clearFilters: function () {
+      var oFilterBar = this.byId("issuesListFilterBarId"),
+        oFilterItems = oFilterBar.getAllFilterItems(true),
+        oIssuesTable = this.byId("tasksTable"),
+        oTableBinding = oIssuesTable.getBinding('items');
+      oTableBinding.filter(new Filter({
+        filters: [],
+        and: true
+      }));
+      var oMasterModel = this.getModel("masterTaskManagementModel");
+      this.getModel("issuesFilterModel").setProperty("/issuesListCount", oIssuesTable.getBinding("items").getLength());
+      var oExportDataModel = this.getModel("tableExportModel");
+      var aData = (oIssuesTable.getItems() || []).map(function (oItem) {
+        return oItem.getBindingContext("masterTaskManagementModel").getObject();
+      });
+      oExportDataModel.setData(aData);
+      for (var i = 0; i < oFilterItems.length; i++) {
+        var oControl = oFilterBar.determineControlByFilterItem(oFilterItems[i]);
+        if (oControl) {
+          oControl.setSelectedKeys("");
+        }
+      }
+      oMasterModel.setProperty("/filterBarData/searchValue", "");
+      oMasterModel.setProperty("/filterBarData/batchFilters", []);
+      oMasterModel.setProperty("/filterBarData/currentRoundFilters", []);
+      oMasterModel.setProperty("/filterBarData/statusFilters", []);
+      oFilterBar.getContent()[0].getContent()[1].setValue("");
     },
 
 		/**
@@ -260,6 +457,8 @@ sap.ui.define([
         oldTasks = oldTasks.concat(this.aMasterData)
 				oMasterTaskmgmtModel.setData(oldTasks);
 				oMasterTaskmgmtModel.refresh(); // refresh model
+        this.getModel("issuesFilterModel").setProperty("/issuesListCount", oldTasks.length);
+        this.aMasterData = [];
 
 				//message toast after creation
 				MessageToast.show(`New Task under project code - ${oCreateTaskModel.getProperty('/projectCode')} created successfully`);
@@ -334,8 +533,8 @@ sap.ui.define([
 					columns: aCols,
 					hierarchyLevel: 'Level'
 				},
-				dataSource: oRowBinding,
-				fileName: 'Table export sample.xlsx',
+				dataSource: this.getModel("tableExportModel").getData(),
+				fileName: 'Issues Table Data.xlsx',
 				worker: false // We need to disable worker because we are using a MockServer as OData Service
 			};
 

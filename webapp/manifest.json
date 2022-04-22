@@ -107,6 +107,12 @@
       },
       "detailTaskManagementModel": {
         "type": "sap.ui.model.json.JSONModel"
+      },
+      "issuesFilterModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "tableExportModel": {
+        "type": "sap.ui.model.json.JSONModel"
       }
     },
     "resources": {
