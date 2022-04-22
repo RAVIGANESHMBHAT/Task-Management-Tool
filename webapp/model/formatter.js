@@ -8,9 +8,22 @@ sap.ui.define([], function () {
           return "Information";
         } else if (sState === "Blocked") {
           return "Error";
-        } else {
+        } else if (sState === "Completed") {
           return "Indication04";
+        } else {
+          return "None";
         }
       },
+
+      getPriorityIcon: function (sVal) {
+        if (sVal === "Low") {
+          return "sap-icon://arrow-bottom";
+        } else if (sVal === "Medium") {
+          return "sap-icon://circle-task-2";
+        } else {
+          return "sap-icon://arrow-top";
+        }
+      },
+
     };
 });

@@ -39,10 +39,12 @@ sap.ui.define([
 			} else {
 				this._setValueStates(oView.byId("userId"), oValidatedObject.sErrorText, "reset");
 				//route
+        sap.ui.core.BusyIndicator.show(0);
 				this.oRouter.navTo("detail", {
 					layout: sap.f.LayoutType.OneColumn,
 					userName: userNameInputValue
 				});
+        location.reload();
 
 				oView.byId("userId").setValue(""); //after navigating successfully empty the user id
 			}

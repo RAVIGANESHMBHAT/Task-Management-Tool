@@ -1,0 +1,90 @@
+<mvc:View displayBlock="true" controllerName="com.ravi.dissertation.TaskManagementTool.controller.DetailDetail"
+          height="100%" xmlns:mvc="sap.ui.core.mvc"
+          xmlns="sap.uxap" xmlns:m="sap.m" xmlns:f="sap.f" xmlns:form="sap.ui.layout.form">
+  <m:Page>
+    <ObjectPageLayout id="ObjectPageLayout" showTitleInHeaderContent="true" alwaysShowContentHeader="false"
+                      preserveHeaderStateOnScroll="true"
+                      headerContentPinnable="true" isChildPage="true" upperCaseAnchorBar="false">
+      <headerTitle>
+        <ObjectPageDynamicHeaderTitle>
+          <expandedHeading>
+            <m:Title text="{detailTaskManagementModel>/taskTitle}" wrapping="true" class="sapUiSmallMarginEnd"/>
+          </expandedHeading>
+          <snappedHeading>
+            <m:Title text="{detailTaskManagementModel>/taskTitle}" wrapping="true" class="sapUiSmallMarginEnd"/>
+          </snappedHeading>
+
+          <navigationActions>
+            <m:OverflowToolbarButton type="Transparent" icon="sap-icon://full-screen" press="handleFullScreen"
+                                     id="enterFullScreenBtn"
+                                     tooltip="Enter Full Screen Mode"
+                                     visible="{= ${/actionButtonsInfo/midColumn/fullScreen} !== null }"/>
+            <m:OverflowToolbarButton type="Transparent" icon="sap-icon://exit-full-screen" press="handleExitFullScreen"
+                                     id="exitFullScreenBtn"
+                                     tooltip="Exit Full Screen Mode"
+                                     visible="{= ${/actionButtonsInfo/midColumn/exitFullScreen} !== null }"/>
+            <m:OverflowToolbarButton type="Transparent" icon="sap-icon://decline" press="handleClose"
+                                     tooltip="Close column" id="closeButton"
+                                     visible="{= ${/actionButtonsInfo/midColumn/closeColumn} !== null }"/>
+          </navigationActions>
+        </ObjectPageDynamicHeaderTitle>
+      </headerTitle>
+      <headerContent>
+        <m:FlexBox wrap="Wrap" fitContainer="true">
+          <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
+            <m:Title text="Task Details" class="sapUiTinyMarginBottom"/>
+            <m:HBox class="sapUiTinyMarginBottom" renderType="Bare">
+              <m:Label text="Assignee:" class="sapUiTinyMarginEnd"/>
+              <m:Text text="{detailTaskManagementModel>/taskAssigneeName}"/>
+            </m:HBox>
+            <m:HBox class="sapUiTinyMarginBottom" renderType="Bare">
+              <m:Label text="Issue Type:" class="sapUiTinyMarginEnd"/>
+              <m:Text text=" {detailTaskManagementModel>/taskType}"/>
+            </m:HBox>
+          </m:VBox>
+          <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
+            <m:Text text="Status" class="sapUiTinyMarginBottom"/>
+            <m:ObjectStatus text="{detailTaskManagementModel>/taskStatus}"
+                            state="{path: 'detailTaskManagementModel>/taskStatus', formatter:'.formatter.formatTaskState'}"
+                            class="sapMObjectStatusLarge"/>
+          </m:VBox>
+          <m:VBox class="sapUiLargeMarginEnd sapUiSmallMarginBottom">
+            <m:Title text="Priority" class="sapUiTinyMarginBottom"/>
+            <m:ObjectStatus text="{detailTaskManagementModel>/taskPriority}"
+                            icon="{path: 'detailTaskManagementModel>/taskPriority', formatter:'.formatter.getPriorityIcon'}"
+                            class="sapMObjectStatusLarge"/>
+          </m:VBox>
+        </m:FlexBox>
+      </headerContent>
+      <sections>
+        <ObjectPageSection>
+          <subSections>
+            <ObjectPageSubSection id="GeneralInfo" title="Basic Information" titleUppercase="false"/>
+          </subSections>
+        </ObjectPageSection>
+
+        <ObjectPageSection titleUppercase="false" title="Comments">
+          <subSections>
+            <ObjectPageSubSection>
+              <m:Text text="-- Yet to be implemented --"/>
+            </ObjectPageSubSection>
+          </subSections>
+        </ObjectPageSection>
+        <ObjectPageSection titleUppercase="false" title="Attachments">
+          <subSections>
+            <ObjectPageSubSection>
+              <m:Text text="-- Yet to be implemented --"/>
+            </ObjectPageSubSection>
+          </subSections>
+        </ObjectPageSection>
+      </sections>
+    </ObjectPageLayout>
+    <m:footer>
+      <m:OverflowToolbar id="otbFooter">
+        <m:ToolbarSpacer></m:ToolbarSpacer>
+        <m:Button tooltip="Save" text="Save" press="handleSavePress"/>
+        <m:Button tooltip="Cancel" text="Cancel" press="handleCancelPress"/>
+      </m:OverflowToolbar>
+    </m:footer>
+  </m:Page>
+</mvc:View>

@@ -104,6 +104,9 @@
       },
       "viewModel": {
         "type": "sap.ui.model.json.JSONModel"
+      },
+      "detailTaskManagementModel": {
+        "type": "sap.ui.model.json.JSONModel"
       }
     },
     "resources": {
@@ -136,6 +139,14 @@
           "target": [
             "detail"
           ]
+        },
+        {
+          "pattern": "detailDetail/{layout}/{userName}/{task}",
+          "name": "detailDetail",
+          "target": [
+            "detail",
+            "detailDetail"
+          ]
         }
       ],
       "targets": {
@@ -146,6 +157,10 @@
         "detail": {
           "viewName": "Detail",
           "controlAggregation": "beginColumnPages"
+        },
+        "detailDetail": {
+          "viewName": "DetailDetail",
+          "controlAggregation": "midColumnPages"
         }
       }
     }
