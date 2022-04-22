@@ -1,34 +1,34 @@
 [
   {
-    "projectCode": "PROJ-1234",
-    "taskTitle": "Task Title 1",
-    "taskType": "Bug",
+    "projectCode": "DM-BLR04",
+    "taskTitle": "Import annotations of OData V4 services -POC",
+    "taskType": "User Story",
     "taskPriority": "Medium",
-    "taskAssigneeName": "Ravi",
+    "taskAssigneeName": "Ashok",
     "taskStatus": "Open"
   },
   {
-    "projectCode": "PROJ-456",
-    "taskTitle": "Task Title 2",
-    "taskType": "Backlog",
+    "projectCode": "CO-BLR01",
+    "taskTitle": "Import OData V2 function adds entity keys to bound action parameters in csn",
+    "taskType": "Bug",
     "taskPriority": "High",
-    "taskAssigneeName": "Ranjan",
+    "taskAssigneeName": "Adhi",
     "taskStatus": "In Progress"
   },
   {
-    "projectCode": "PROJ-456",
-    "taskTitle": "Task Title 2",
+    "projectCode": "DM-BLR04",
+    "taskTitle": "Generate the distinct hostnames for deployed kyma apps",
     "taskType": "User Story",
-    "taskPriority": "High",
-    "taskAssigneeName": "Ranjanii",
+    "taskPriority": "Medium",
+    "taskAssigneeName": "Dileep",
     "taskStatus": "Blocked"
   },
   {
-    "projectCode": "PROJ-456",
-    "taskTitle": "Task Title 2",
+    "projectCode": "GS-BLR02",
+    "taskTitle": "Refactoring the service binding files for Kyma",
     "taskType": "Backlog",
-    "taskPriority": "High",
-    "taskAssigneeName": "Ranjanana",
+    "taskPriority": "Low",
+    "taskAssigneeName": "Ashok",
     "taskStatus": "Completed"
   }
 ]

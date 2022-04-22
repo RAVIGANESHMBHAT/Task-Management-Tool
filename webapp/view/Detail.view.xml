@@ -27,37 +27,34 @@
           <fb:FilterBar id="issuesListFilterBarId" reset="onReset" search="onSearchIssuesList" useToolbar="true" showGoOnFB="false" showClearOnFB="true" clear="clearFilters"
                         advancedMode="false" showFilterConfiguration="false" expandAdvancedArea="false">
             <fb:filterItems>
-              <fb:FilterItem name="A" label="Project Name">
+              <fb:FilterItem name="A" label="Project ID">
                 <fb:control>
-                  <Select
-                    id="slName"
-                    forceSelection="true"
-                    change="onSelectChange"
-                    items="{
-                        path: '/ProductNames'
-                    }">
-                    <core:Item key="{key}" text="{name}"/>
-                  </Select>
+                  <MultiComboBox
+                    id="projectIDComboBoxId"
+                    selectionFinish="onProjectIdFiltersSelectionChange"
+                    placeholder="Select Project ID"
+                    items="{ path: 'projectModel>/', sorter: { path: 'projectId' } }">
+                    <core:Item key="{projectModel>projectId}" text="{projectModel>projectCode}"/>
+                  </MultiComboBox>
                 </fb:control>
               </fb:FilterItem>
               <fb:FilterItem name="B" label="Issue Type">
                 <fb:control>
-                  <Select
-                    id="slCategory"
-                    change="onSelectChange"
-                    forceSelection="true"
-                    items="{
-                      path: '/ProductCategories'
-                   }">
-                    <core:Item key="{key}" text="{name}"/>
-                  </Select>
+                  <MultiComboBox
+                    id="issueTypeComboBoxId"
+                    selectionFinish="onIssueTypeFiltersSelectionChange"
+                    placeholder="Select Issue Type"
+                    items="{ path: 'taskTypesModel>/', sorter: { path: 'taskTypeCode' } }">
+                    <core:Item key="{taskTypesModel>taskTypeCode}" text="{taskTypesModel>name}"/>
+                  </MultiComboBox>
                 </fb:control>
               </fb:FilterItem>
               <fb:FilterItem name="C" label="Priority">
                 <fb:control>
                   <MultiComboBox
-                    id="slSupplierName"
-                    change="onSelectChange"
+                    id="priorityComboBoxId"
+                    selectionFinish="onPriorityFiltersSelectionChange"
+                    placeholder="Select Issue Priority"
                     >
                     <core:Item key="low" text="Low"/>
                     <core:Item key="medium" text="Medium"/>
@@ -68,8 +65,9 @@
               <fb:FilterItem name="D" label="Status">
                 <fb:control>
                   <MultiComboBox
-                    id="slCategory1"
-                    change="onSelectChange"
+                    id="statusComboBoxId"
+                    selectionFinish="onStatusFiltersSelectionChange"
+                    placeholder="Select Issue Status"
                     >
                     <core:Item key="open" text="Open"/>
                     <core:Item key="in_progress" text="In Progress"/>
@@ -89,42 +87,40 @@
              noDataText="No issues created." class="sapFDynamicPageAlignContent" width="auto" sticky="ColumnHeaders,HeaderToolbar">
         <headerToolbar>
           <OverflowToolbar>
-            <Title text="Issues List ({= ${masterTaskManagementModel>/}.length})" level="H2"/>
+            <Title text="Issues List ({issuesFilterModel>/issuesListCount})" level="H2"/>
             <ToolbarSpacer/>
-<!--            <SearchField search="onSearch" placeholder="Search by Project Code" width="17.5rem"/>-->
-<!--            <Button type="Emphasized" text="Create Project" press="onCreateProject"/>-->
             <Button id="createTaskBtn" type="Transparent" text="Create Issue" press="onCreateIssue"
                     tooltip="Create a new issue"/>
             <Button id="exportBtn" icon="sap-icon://excel-attachment" press="onExport"
-                    tooltip="Export table data into excel file."/>
+                    tooltip="Export table data into excel file." enabled="{= ${issuesFilterModel>/issuesListCount} > 0 }"/>
           </OverflowToolbar>
         </headerToolbar>
         <columns>
-          <Column width="12em">
+          <Column width="40%">
             <Text text="Issue"/>
           </Column>
-          <Column hAlign="Begin">
+          <Column hAlign="Begin" width="15%">
             <Text text="Type"/>
           </Column>
-          <Column hAlign="Begin">
+          <Column hAlign="Begin" width="15%">
             <Text text="Priority"/>
           </Column>
-          <Column hAlign="Begin">
+          <Column hAlign="Begin" width="15%">
             <Text text="Assignee"/>
           </Column>
-          <Column hAlign="Begin">
+          <Column hAlign="Begin" width="15%">
             <Text text="Status"/>
           </Column>
         </columns>
         <items>
           <ColumnListItem type="Navigation" press="onListItemPress">
             <cells>
-              <ObjectIdentifier
-                title="{masterTaskManagementModel>projectCode}"
-                text="{masterTaskManagementModel>taskTitle}"/>
+              <VBox class="sapUiSmallMarginTopBottom">
+                <Title text ="{masterTaskManagementModel>projectCode}"/>
+                <ExpandableText class="sapUiTinyMarginTopBottom" maxCharacters="40" text="{masterTaskManagementModel>taskTitle}" overflowMode="Popover"/>
+              </VBox>
               <Text text="{masterTaskManagementModel>taskType}"/>
-              <ObjectStatus text="{masterTaskManagementModel>taskPriority}"
-                            state="{path: 'masterTaskManagementModel>taskPriority1', formatter:'.formatter.formatTaskPriority'}"/>
+              <Text text="{masterTaskManagementModel>taskPriority}"/>
               <Text text="{masterTaskManagementModel>taskAssigneeName}"/>
               <ObjectStatus text="{masterTaskManagementModel>taskStatus}"
                             state="{path: 'masterTaskManagementModel>taskStatus', formatter:'.formatter.formatTaskState'}"/>
