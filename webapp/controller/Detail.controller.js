@@ -90,6 +90,7 @@ sap.ui.define([
       if (oBasicSearch) {
         oFilterBar.setBasicSearch(oBasicSearch);
       }
+      sap.ui.core.BusyIndicator.hide(1);
 		},
 
     handleIssuesListSearch: function(oEvent) {
