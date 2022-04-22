@@ -1,0 +1,57 @@
+<core:FragmentDefinition xmlns:core='sap.ui.core' xmlns='sap.m' xmlns:f="sap.ui.layout.form"
+                         xmlns:r="sap.ui.richtexteditor">
+  <Dialog id="CreateDialog" title="Create Issue">
+    <VBox class="sapUiSmallMargin">
+      <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+        <f:content>
+          <Label text="{i18n>Project}" required="true"/>
+          <Select id="create-project" forceSelection="false" selectedKey="{createTaskModel>/projectId}"
+                  showSecondaryValues="true"
+                  items="{ path: 'projectModel>/', sorter: { path: 'projectId' } }">
+            <core:ListItem key="{projectModel>projectId}" text="{projectModel>projectCode}"
+                           additionalText="{projectModel>projectName}"/>
+          </Select>
+          <Label text="{i18n>IssueType}" required="true"/>
+          <Select id="create-taskType" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskTypeCode}"
+                  items="{ path: 'taskTypesModel>/', sorter: { path: 'taskTypeCode' } }">
+            <core:ListItem key="{taskTypesModel>taskTypeCode}" text="{taskTypesModel>name}"
+                           icon="{taskTypesModel>icon}"/>
+          </Select>
+        </f:content>
+      </f:SimpleForm>
+      <f:SimpleForm id="SimpleFormDisplay354wideDual" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4"
+                    title="Basic" labelSpanL="4"
+                    labelSpanM="4" labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="4" emptySpanM="0"
+                    emptySpanS="0" columnsXL="1"
+                    columnsL="1" columnsM="1" singleContainerFullSize="true">
+        <f:content>
+          <Label text="Summary" required="true"/>
+          <Input id="nameText" value="{createTaskModel>/tasks/taskTitle}"/>
+          <Label text="Description" required="true"/>
+          <r:RichTextEditor editorType="TinyMCE4" width="500px" height="250px" customToolbar="false"
+                            showGroupFont="true" showGroupLink="true"
+                            value="{createTaskModel>/tasks/taskDescription}" showGroupInsert="true"/>
+          <Label text="Original Estimate" required="true"/>
+          <Input id="originalEstimateId" value="{createTaskModel>/tasks/originalEstimate}"/>
+          <Label text="Priority" required="true"/>
+          <Select id="create-priority" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskPrioCode}"
+                  items="{ path: 'taskManagement>/TaskPriority', sorter: { path: 'taskPrioCode' } }">
+            <core:ListItem key="{taskManagement>taskPrioCode}" text="{taskManagement>name}"
+                           icon="{taskManagement>icon}"/>
+          </Select>
+          <Label text="Assignee" required="true"/>
+          <Select id="create-assignee" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskAssgineeId}"
+                  items="{ path: 'userModel>/', sorter: { path: 'id' } }">
+            <core:ListItem key="{userModel>id}" text="{userModel>name}"/>
+          </Select>
+        </f:content>
+      </f:SimpleForm>
+    </VBox>
+    <beginButton>
+      <Button text="{i18n>save}" press="onSaveTask" enabled="true" type="Emphasized"/>
+    </beginButton>
+    <endButton>
+      <Button text="{i18n>close}" press="onCloseCreateTaskDialog"/>
+    </endButton>
+  </Dialog>
+</core:FragmentDefinition>

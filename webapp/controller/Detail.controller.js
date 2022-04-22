@@ -39,46 +39,32 @@ sap.ui.define([
 
 			this._createReportFragment = {}; //initialize report fragment
 
-			this.byId("createTaskBtn").setEnabled(false); //initially disable create task button and enable after creating one project
+			//this.byId("createTaskBtn").setEnabled(false); //initially disable create task button and enable after creating one project
 
-			this.byId("exportBtn").setEnabled(false);
+			//this.byId("exportBtn").setEnabled(false);
 
       const oModel = this.getOwnerComponent().getModel("masterTaskManagementModel");
-      oModel.setData([
-          {
-            projectCode: "PROJ-123",
-            taskTitle: "Task Title 1",
-            taskType: "Bug",
-            taskPriority: "Medium",
-            taskAssigneeName: "Ravi",
-            taskStatus: "Open"
-          },
-          {
-            projectCode: "PROJ-456",
-            taskTitle: "Task Title 2",
-            taskType: "Backlog",
-            taskPriority: "High",
-            taskAssigneeName: "Ranjan",
-            taskStatus: "In Progress"
-          },
+      oModel.loadData("localService/mockdata/IssuesList.json")
+
+      const oTaskPrio = [
         {
-          projectCode: "PROJ-456",
-          taskTitle: "Task Title 2",
-          taskType: "Backlog",
-          taskPriority: "High",
-          taskAssigneeName: "Ranjanii",
-          taskStatus: "Blocked"
+          "name": "Low",
+          "taskPrioCode": 0,
+          "icon":"sap-icon://arrow-bottom"
         },
         {
-          projectCode: "PROJ-456",
-          taskTitle: "Task Title 2",
-          taskType: "Backlog",
-          taskPriority: "High",
-          taskAssigneeName: "Ranjan",
-          taskStatus: "Completed"
+          "name": "Medium",
+          "taskPrioCode": 1,
+          "icon": "sap-icon://circle-task-2"
+        },
+        {
+          "name": "High",
+          "taskPrioCode": 2,
+          "icon":"sap-icon://arrow-top"
         }
-        ]
-      )
+      ]
+      const oTaskMgntModel = this.getOwnerComponent().getModel("taskManagement");
+      oTaskMgntModel.setProperty("/TaskPriority", oTaskPrio);
 		},
 
 		/**
@@ -161,7 +147,7 @@ sap.ui.define([
 			if (!this.createIssueDialog) {
 				this.createIssueDialog = Fragment.load({
 					id: oView.getId(),
-					name: "com.vistex.taskmanagement.fragments.CreateIssue",
+					name: "com.ravi.dissertation.TaskManagementTool.fragments.CreateIssue",
 					controller: this //bind controller to fragment for eventing
 				}).then(function (oDialog) {
 					// connect dialog to the root view of this component (models, lifecycle)
@@ -228,7 +214,9 @@ sap.ui.define([
 			let createProjectModelData = this.oComponent.getModel("createProjectModel").getData();
 			if (createProjectModelData.projectCode.trim() !== "" && createProjectModelData.projectName.trim() !== "") {
 				this._aProjects.push(createProjectModelData);
-				this.oComponent.getModel("projectModel").setData(this._aProjects)
+        let oldProjects = this.oComponent.getModel("projectModel").getData();
+        oldProjects = oldProjects.concat(this._aProjects);
+				this.oComponent.getModel("projectModel").setData(oldProjects); //this._aProjects
 				this.oComponent.getModel("projectModel").refresh();
 				this.byId("CreateProjectDialog").close();
 				this.byId("createTaskBtn").setEnabled(true);
@@ -257,14 +245,19 @@ sap.ui.define([
 				//Note: Validation using message manager is pending...
 				oCreateTaskModel.setProperty("/projectCode", oProjectInputItem.getText());
 				oCreateTaskModel.setProperty("/projectName", oProjectInputItem.getText());
-				oCreateTaskModel.setProperty("/tasks/taskTypeName", oTaskTypeInputItem.getText());
-				oCreateTaskModel.setProperty("/tasks/taskAssigneeName", oCreateAssigneeInputItem.getText());
-				oCreateTaskModel.setProperty("/tasks/taskPriorityName", oCreatePrioInputItem.getText());
+				oCreateTaskModel.setProperty("/taskType", oTaskTypeInputItem.getText());
+				oCreateTaskModel.setProperty("/taskAssigneeName", oCreateAssigneeInputItem.getText());
+				oCreateTaskModel.setProperty("/taskPriority", oCreatePrioInputItem.getText());
+
+        oCreateTaskModel.setProperty("/taskTitle", oCreateTaskModel.getProperty("/tasks/taskTitle"))
+        oCreateTaskModel.setProperty("/taskStatus", oCreateTaskModel.getProperty("/tasks/taskStatus"))
 
 				let oMasterTaskmgmtModel = this.oComponent.getModel("masterTaskManagementModel");
 
 				this.aMasterData.push(oCreateTaskModel.getData()); //push the newly created issue into the masterTaskManagementModel model
-				oMasterTaskmgmtModel.setData(this.aMasterData);
+        let oldTasks = oMasterTaskmgmtModel.getData();
+        oldTasks = oldTasks.concat(this.aMasterData)
+				oMasterTaskmgmtModel.setData(oldTasks);
 				oMasterTaskmgmtModel.refresh(); // refresh model
 
 				//message toast after creation
@@ -286,41 +279,35 @@ sap.ui.define([
 			var aCols = [];
 
 			aCols.push({
-				label: 'Issues',
+				label: 'Project Name',
 				property: 'projectCode',
 				type: EdmType.String
 			});
-
 			aCols.push({
-				label: 'project Name',
+				label: 'Task Title',
 				type: EdmType.String,
-				property: 'projectName'
+				property: 'taskTitle'
 			});
 			aCols.push({
-				label: 'task title',
+				label: 'Task Type',
 				type: EdmType.String,
-				property: 'tasks/taskTitle'
+				property: 'taskType'
 			});
 			aCols.push({
-				label: 'task type',
+				label: 'Task Assignee',
 				type: EdmType.String,
-				property: 'tasks/taskTypeName'
+				property: 'taskAssigneeName'
 			});
 			aCols.push({
-				label: 'task assignee',
+				label: 'Task Priority',
 				type: EdmType.String,
-				property: 'tasks/taskAssigneeName'
-			});
-			aCols.push({
-				label: 'task priority',
-				type: EdmType.String,
-				property: 'tasks/taskPriorityName'
+				property: 'taskPriority'
 			});
 
 			aCols.push({
-				label: 'task status',
+				label: 'Task Status',
 				type: EdmType.String,
-				property: 'tasks/taskStatus'
+				property: 'taskStatus'
 			});
 
 			return aCols;

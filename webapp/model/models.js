@@ -31,5 +31,35 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/Device"], function (JSONMo
       let oModel = new JSONModel(oProjectModel);
       return oModel;
     },
+
+    createTaskModel: function () {
+      var oTaskModel = {
+        projectId: "",
+        generatedProjectNo: Math.floor(Math.random() * 90000) + 10000,
+        projectCode: "",
+        projectName: "",
+        tasks: {
+          taskTypeCode: null,
+          taskTypeName: "",
+          taskTitle: "",
+          taskDescription: "",
+          taskAssigneeId: null,
+          taskAssigneeName: "",
+          taskPrioCode: null,
+          taskPriorityName: "",
+          taskStatusCode: "0",
+          taskStatus: "Open",
+          taskComments: [],
+          taskAttachments: {
+            "items": []
+          }
+
+        }
+      };
+
+      let oModel = new JSONModel(oTaskModel);
+      return oModel;
+    },
+
   };
 });
