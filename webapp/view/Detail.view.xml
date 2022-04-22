@@ -25,7 +25,7 @@
       <f:DynamicPageHeader pinnable="true">
         <f:content>
           <fb:FilterBar id="issuesListFilterBarId" reset="onReset" search="onSearchIssuesList" useToolbar="true" showGoOnFB="false" showClearOnFB="true" clear="clearFilters"
-                        advancedMode="false" showFilterConfiguration="false">
+                        advancedMode="false" showFilterConfiguration="false" expandAdvancedArea="false">
             <fb:filterItems>
               <fb:FilterItem name="A" label="Project Name">
                 <fb:control>
@@ -89,7 +89,7 @@
              noDataText="No issues created." class="sapFDynamicPageAlignContent" width="auto" sticky="ColumnHeaders,HeaderToolbar">
         <headerToolbar>
           <OverflowToolbar>
-            <Title text="Issues List (0)" level="H2"/>
+            <Title text="Issues List ({= ${masterTaskManagementModel>/}.length})" level="H2"/>
             <ToolbarSpacer/>
 <!--            <SearchField search="onSearch" placeholder="Search by Project Code" width="17.5rem"/>-->
 <!--            <Button type="Emphasized" text="Create Project" press="onCreateProject"/>-->

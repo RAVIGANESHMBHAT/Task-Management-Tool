@@ -25,6 +25,14 @@
       "reportModel": {
         "uri": "localService/mockdata/UserBurndownData.json",
         "type": "JSON"
+      },
+      "taskTypesModel": {
+        "uri": "localService/mockdata/TaskType.json",
+        "type": "JSON"
+      },
+      "projectModel": {
+        "uri": "localService/mockdata/Projects.json",
+        "type": "JSON"
       }
     }
   },
@@ -80,10 +88,13 @@
         "dataSource": "reportModel"
       },
       "taskManagement": {
-        "dataSource": "taskManagementRemote"
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "taskTypesModel": {
+        "dataSource": "taskTypesModel"
       },
       "projectModel": {
-        "type": "sap.ui.model.json.JSONModel"
+        "dataSource": "projectModel"
       },
       "masterTaskManagementModel": {
         "type": "sap.ui.model.json.JSONModel"

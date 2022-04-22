@@ -13,9 +13,9 @@
           </Select>
           <Label text="{i18n>IssueType}" required="true"/>
           <Select id="create-taskType" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskTypeCode}"
-                  items="{ path: 'taskManagement>/TaskType', sorter: { path: 'taskTypeCode' } }">
-            <core:ListItem key="{taskManagement>taskTypeCode}" text="{taskManagement>name}"
-                           icon="{taskManagement>icon}"/>
+                  items="{ path: 'taskTypesModel>/', sorter: { path: 'taskTypeCode' } }">
+            <core:ListItem key="{taskTypesModel>taskTypeCode}" text="{taskTypesModel>name}"
+                           icon="{taskTypesModel>icon}"/>
           </Select>
         </f:content>
       </f:SimpleForm>
@@ -25,22 +25,24 @@
                     emptySpanS="0" columnsXL="1"
                     columnsL="1" columnsM="1" singleContainerFullSize="true">
         <f:content>
-          <Label text="Title" required="true"/>
+          <Label text="Summary" required="true"/>
           <Input id="nameText" value="{createTaskModel>/tasks/taskTitle}"/>
           <Label text="Description" required="true"/>
-          <r:RichTextEditor editorType="TinyMCE4" width="400px" height="250px" customToolbar="false"
+          <r:RichTextEditor editorType="TinyMCE4" width="500px" height="250px" customToolbar="false"
                             showGroupFont="true" showGroupLink="true"
                             value="{createTaskModel>/tasks/taskDescription}" showGroupInsert="true"/>
-          <Label text="Assignee" required="true"/>
-          <Select id="create-assignee" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskAssgineeId}"
-                  items="{ path: 'userModel>/', sorter: { path: 'id' } }">
-            <core:ListItem key="{userModel>id}" text="{userModel>name}"/>
-          </Select>
+          <Label text="Original Estimate" required="true"/>
+          <Input id="originalEstimateId" value="{createTaskModel>/tasks/originalEstimate}"/>
           <Label text="Priority" required="true"/>
           <Select id="create-priority" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskPrioCode}"
                   items="{ path: 'taskManagement>/TaskPriority', sorter: { path: 'taskPrioCode' } }">
             <core:ListItem key="{taskManagement>taskPrioCode}" text="{taskManagement>name}"
                            icon="{taskManagement>icon}"/>
+          </Select>
+          <Label text="Assignee" required="true"/>
+          <Select id="create-assignee" forceSelection="false" selectedKey="{createTaskModel>/tasks/taskAssgineeId}"
+                  items="{ path: 'userModel>/', sorter: { path: 'id' } }">
+            <core:ListItem key="{userModel>id}" text="{userModel>name}"/>
           </Select>
         </f:content>
       </f:SimpleForm>

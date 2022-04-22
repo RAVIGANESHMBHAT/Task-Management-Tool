@@ -48,7 +48,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/Device"], function (JSONMo
           taskPrioCode: null,
           taskPriorityName: "",
           taskStatusCode: "0",
-          taskStatus: "New",
+          taskStatus: "Open",
           taskComments: [],
           taskAttachments: {
             "items": []
