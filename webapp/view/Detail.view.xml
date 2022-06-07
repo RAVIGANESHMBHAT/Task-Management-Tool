@@ -24,7 +24,8 @@
     <f:header>
       <f:DynamicPageHeader pinnable="true">
         <f:content>
-          <fb:FilterBar id="issuesListFilterBarId" reset="onReset" search="onSearchIssuesList" useToolbar="true" showGoOnFB="false" showClearOnFB="true" clear="clearFilters"
+          <fb:FilterBar id="issuesListFilterBarId" reset="onReset" search="onSearchIssuesList" useToolbar="true"
+                        showGoOnFB="false" showClearOnFB="true" clear="clearFilters"
                         advancedMode="false" showFilterConfiguration="false" expandAdvancedArea="false">
             <fb:filterItems>
               <fb:FilterItem name="A" label="Project ID">
@@ -55,7 +56,7 @@
                     id="priorityComboBoxId"
                     selectionFinish="onPriorityFiltersSelectionChange"
                     placeholder="Select Issue Priority"
-                    >
+                  >
                     <core:Item key="low" text="Low"/>
                     <core:Item key="medium" text="Medium"/>
                     <core:Item key="high" text="High"/>
@@ -68,7 +69,7 @@
                     id="statusComboBoxId"
                     selectionFinish="onStatusFiltersSelectionChange"
                     placeholder="Select Issue Status"
-                    >
+                  >
                     <core:Item key="open" text="Open"/>
                     <core:Item key="in_progress" text="In Progress"/>
                     <core:Item key="blocked" text="Blocked"/>
@@ -84,7 +85,8 @@
     <!-- DynamicPage Content -->
     <f:content>
       <Table id="tasksTable" inset="false" items="{path: 'masterTaskManagementModel>/'}"
-             noDataText="No issues created." class="sapFDynamicPageAlignContent" width="auto" sticky="ColumnHeaders,HeaderToolbar">
+             noDataText="No issues created." class="sapFDynamicPageAlignContent" width="auto"
+             sticky="ColumnHeaders,HeaderToolbar">
         <headerToolbar>
           <OverflowToolbar>
             <Title text="Issues List ({issuesFilterModel>/issuesListCount})" level="H2"/>
@@ -92,7 +94,8 @@
             <Button id="createTaskBtn" type="Transparent" text="Create Issue" press="onCreateIssue"
                     tooltip="Create a new issue"/>
             <Button id="exportBtn" icon="sap-icon://excel-attachment" press="onExport"
-                    tooltip="Export table data into excel file." enabled="{= ${issuesFilterModel>/issuesListCount} > 0 }"/>
+                    tooltip="Export table data into excel file."
+                    enabled="{= ${issuesFilterModel>/issuesListCount} > 0 }"/>
           </OverflowToolbar>
         </headerToolbar>
         <columns>
@@ -116,8 +119,9 @@
           <ColumnListItem type="Navigation" press="onListItemPress">
             <cells>
               <VBox class="sapUiSmallMarginTopBottom">
-                <Title text ="{masterTaskManagementModel>projectCode}"/>
-                <ExpandableText class="sapUiTinyMarginTopBottom" maxCharacters="40" text="{masterTaskManagementModel>taskTitle}" overflowMode="Popover"/>
+                <Title text="{masterTaskManagementModel>projectCode}"/>
+                <ExpandableText class="sapUiTinyMarginTopBottom" maxCharacters="40"
+                                text="{masterTaskManagementModel>taskTitle}" overflowMode="Popover"/>
               </VBox>
               <Text text="{masterTaskManagementModel>taskType}"/>
               <Text text="{masterTaskManagementModel>taskPriority}"/>

@@ -1,23 +1,27 @@
-<mvc:View displayBlock="true" controllerName="com.ravi.dissertation.TaskManagementTool.controller.Login" height="100%" xmlns="sap.m"
-	xmlns:mvc="sap.ui.core.mvc">
-	<Page title="Login Form" showHeader="false" class="loginPageBg">
-		<content>
-			<FlexBox fitContainer="true" direction="Column" alignItems="Center" justifyContent="Center" alignContent="Center">
-				<MessageStrip id="loginUserErrMsgStrip" type="Error" visible="false" showIcon="true" class="sapUiMediumMarginBottom"></MessageStrip>
-				<Input id="userId" placeholder="User ID"></Input>
-				<Input id="pasw" placeholder="Password" type="Password"></Input>
-				<Button width="12rem" text="Login" type="Emphasized" press="onLogin"></Button>
-				<HBox class="sapUiResponsiveMargin"><Text text="New User?"/>
-					<Link class="sapUiResponsiveMargintext sapUiTinyMarginBegin" text="Click here to register" press="onRegisterUser"></Link>
-				</HBox>
-			</FlexBox>
-		</content>
-		<footer>
-			<Bar>
-				<contentLeft>
-					<Text text="Copyrights © - Raviganesh M"/>
-				</contentLeft>
-			</Bar>
-		</footer>
-	</Page>
+<mvc:View displayBlock="true" controllerName="com.ravi.dissertation.TaskManagementTool.controller.Login" height="100%"
+          xmlns="sap.m"
+          xmlns:mvc="sap.ui.core.mvc">
+  <Page title="Login Form" showHeader="false" class="loginPageBg">
+    <content>
+      <FlexBox fitContainer="true" direction="Column" alignItems="Center" justifyContent="Center" alignContent="Center">
+        <MessageStrip id="loginUserErrMsgStrip" type="Error" visible="false" showIcon="true"
+                      class="sapUiMediumMarginBottom"/>
+        <Input id="userId" placeholder="User ID"/>
+        <Input id="pasw" placeholder="Password" type="Password"/>
+        <Button width="12rem" text="Login" type="Emphasized" press="onLogin"/>
+        <HBox class="sapUiResponsiveMargin">
+          <Text text="New User?"/>
+          <Link class="sapUiResponsiveMargintext sapUiTinyMarginBegin" text="Click here to register"
+                press="onRegisterUser"/>
+        </HBox>
+      </FlexBox>
+    </content>
+    <footer>
+      <Bar>
+        <contentLeft>
+          <Text text="© Raviganesh M. All rights reserved"/>
+        </contentLeft>
+      </Bar>
+    </footer>
+  </Page>
 </mvc:View>

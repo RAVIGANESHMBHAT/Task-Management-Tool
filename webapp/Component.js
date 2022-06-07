@@ -8,7 +8,7 @@ sap.ui.define(
     "sap/ui/Device",
     "com/ravi/dissertation/TaskManagementTool/model/models",
   ],
-  function (UriParameters, UIComponent, JSONModel, library, FlexibleColumnLayoutSemanticHelper,  Device, models) {
+  function (UriParameters, UIComponent, JSONModel, library, FlexibleColumnLayoutSemanticHelper, Device, models) {
     "use strict";
 
     const LayoutType = library.LayoutType;

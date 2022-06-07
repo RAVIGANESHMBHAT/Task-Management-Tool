@@ -1,20 +1,20 @@
 <core:FragmentDefinition xmlns:core='sap.ui.core' xmlns='sap.m' xmlns:f="sap.ui.layout.form">
-	<Dialog id="CreateProjectDialog" title="New Project">
-		<VBox class="sapUiSmallMargin">
-			<f:SimpleForm editable="true" layout="ResponsiveGridLayout">
-				<f:content>
-					<Label text="{i18n>ProjectCode}" required="true"/>
-					<Input value="{createProjectModel>/projectCode}"/>
-					<Label text="{i18n>ProjectName}" required="true"/>
-					<Input value="{createProjectModel>/projectName}"/>
-				</f:content>
-			</f:SimpleForm>
-		</VBox>
-		<beginButton>
-			<Button text="{i18n>save}" press="onProjectSave" enabled="true" type="Emphasized"/>
-		</beginButton>
-		<endButton>
-			<Button text="{i18n>close}" press="onCloseCreateProjectDialog"/>
-		</endButton>
-	</Dialog>
+  <Dialog id="CreateProjectDialog" title="New Project">
+    <VBox class="sapUiSmallMargin">
+      <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+        <f:content>
+          <Label text="{i18n>ProjectCode}" required="true"/>
+          <Input value="{createProjectModel>/projectCode}"/>
+          <Label text="{i18n>ProjectName}" required="true"/>
+          <Input value="{createProjectModel>/projectName}"/>
+        </f:content>
+      </f:SimpleForm>
+    </VBox>
+    <beginButton>
+      <Button text="{i18n>save}" press="onProjectSave" enabled="true" type="Emphasized"/>
+    </beginButton>
+    <endButton>
+      <Button text="{i18n>close}" press="onCloseCreateProjectDialog"/>
+    </endButton>
+  </Dialog>
 </core:FragmentDefinition>

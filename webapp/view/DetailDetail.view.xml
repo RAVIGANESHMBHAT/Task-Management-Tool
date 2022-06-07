@@ -1,6 +1,6 @@
 <mvc:View displayBlock="true" controllerName="com.ravi.dissertation.TaskManagementTool.controller.DetailDetail"
           height="100%" xmlns:mvc="sap.ui.core.mvc"
-          xmlns="sap.uxap" xmlns:m="sap.m" xmlns:f="sap.f" xmlns:form="sap.ui.layout.form">
+          xmlns="sap.uxap" xmlns:m="sap.m">
   <m:Page>
     <ObjectPageLayout id="ObjectPageLayout" showTitleInHeaderContent="true" alwaysShowContentHeader="false"
                       preserveHeaderStateOnScroll="true"
@@ -81,7 +81,7 @@
     </ObjectPageLayout>
     <m:footer>
       <m:OverflowToolbar id="otbFooter">
-        <m:ToolbarSpacer></m:ToolbarSpacer>
+        <m:ToolbarSpacer/>
         <m:Button tooltip="Save" text="Save" press="handleSavePress"/>
         <m:Button tooltip="Cancel" text="Cancel" press="handleCancelPress"/>
       </m:OverflowToolbar>

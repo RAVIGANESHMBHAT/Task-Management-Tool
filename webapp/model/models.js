@@ -26,7 +26,7 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/Device"], function (JSONMo
         generatedProjectNo: Math.floor(Math.random() * 90000) + 10000,
         projectCode: "",
         projectName: "",
-      }
+      };
 
       let oModel = new JSONModel(oProjectModel);
       return oModel;
