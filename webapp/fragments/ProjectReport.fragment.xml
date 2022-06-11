@@ -1,0 +1,19 @@
+<core:FragmentDefinition xmlns:core='sap.ui.core' xmlns='sap.m' xmlns:cc='taskmanagementtool.controls'>
+  <Dialog id="customControlReportDialog" title="Project Report">
+
+
+    <FlexBox id="burndownchartcontainer" alignItems="Start"
+             justifyContent="Center"></FlexBox>
+    <!--<VBox>-->
+    <!--	<cc:BurndownChart items="{path: 'reportModel>/0/burndown'}">-->
+    <!--		<cc:BurndownChartItem username="{reportModel>username}" tasks="{reportModel>tasks}"/>-->
+    <!--	</cc:BurndownChart>-->
+    <!--</VBox>-->
+    <beginButton>
+      <Button text="Print" press="onPrintReportDialog" type="Emphasized"/>
+    </beginButton>
+    <endButton>
+      <Button text="Cancel" press="oncloseReportDialog"/>
+    </endButton>
+  </Dialog>
+</core:FragmentDefinition>

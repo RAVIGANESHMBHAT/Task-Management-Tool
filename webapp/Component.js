@@ -1,22 +1,22 @@
-sap.ui.define(
-  [
-    "sap/base/util/UriParameters",
+sap.ui.define([
     "sap/ui/core/UIComponent",
-    "sap/ui/model/json/JSONModel",
-    "sap/f/library",
-    "sap/f/FlexibleColumnLayoutSemanticHelper",
     "sap/ui/Device",
-    "com/ravi/dissertation/TaskManagementTool/model/models",
+    "taskmanagementtool/model/models",
+    "sap/base/util/UriParameters",
+    "sap/f/FlexibleColumnLayoutSemanticHelper",
+    "sap/f/library",
+    "taskmanagementtool/helpers/Api",
+    "sap/ui/model/json/JSONModel",
+    "taskmanagementtool/helpers/ApiHandlers",
   ],
-  function (UriParameters, UIComponent, JSONModel, library, FlexibleColumnLayoutSemanticHelper, Device, models) {
+  function (UIComponent, Device, models, UriParameters, FlexibleColumnLayoutSemanticHelper, library, Api, JSONModel, ApiHandlers) {
     "use strict";
 
     const LayoutType = library.LayoutType;
 
-    return UIComponent.extend("com.ravi.dissertation.TaskManagementTool.Component", {
+    return UIComponent.extend("taskmanagementtool.Component", {
       metadata: {
-        manifest: "json",
-        interfaces: ["sap.ui.core.IAsyncContentCreation"]
+        manifest: "json"
       },
 
       /**
@@ -31,11 +31,118 @@ sap.ui.define(
         // enable routing
         this.getRouter().initialize();
 
-        const oModel = new JSONModel();
-        this.setModel(oModel);
-
         // set the device model
-        //this.setModel(models.createDeviceModel(), "device");
+        this.setModel(models.createDeviceModel(), "device");
+
+        const oModel = new JSONModel();
+        this.setModel(oModel, "layoutModel");
+
+        const oMasterTaskManagementModel = new JSONModel();
+        this.setModel(oMasterTaskManagementModel, "masterTaskManagementModel");
+
+        const oProjectModel = new JSONModel();
+        this.setModel(oProjectModel, "projectModel");
+
+        const oTaskTypesModel = new JSONModel([
+          {
+            "name": "Bug",
+            "taskTypeCode": 0,
+            "icon": "sap-icon://quality-issue"
+          },
+          {
+            "name": "Backlog",
+            "taskTypeCode": 1,
+            "icon": "sap-icon://activities"
+          },
+          {
+            "name": "User Story",
+            "taskTypeCode": 2,
+            "icon": "sap-icon://work-history"
+          }
+        ]);
+        this.setModel(oTaskTypesModel, "taskTypesModel");
+
+        ApiHandlers.handleGetApiCall("https://task-manage-dissertation.herokuapp.com/users", {}).then((users) => {
+          const oUserModel = new JSONModel(users);
+          this.setModel(oUserModel, "userModel");
+        }).catch((err) => {
+          console.log(err);
+        });
+
+        this.setModel(new JSONModel([
+          {
+            "burndown": [
+              {
+                "username": "Vaibhav",
+                "tasks": [
+                  {
+                    "tasktype": "Story",
+                    "assignedno": "3"
+                  },
+                  {
+                    "tasktype": "Bug",
+                    "assignedno": "2"
+                  },
+                  {
+                    "tasktype": "Task",
+                    "assignedno": "2"
+                  }
+                ]
+              },
+              {
+                "username": "Abhi",
+                "tasks": [
+                  {
+                    "tasktype": "Story",
+                    "assignedno": "5"
+                  },
+                  {
+                    "tasktype": "Bug",
+                    "assignedno": "3"
+                  },
+                  {
+                    "tasktype": "Task",
+                    "assignedno": "2"
+                  }
+                ]
+              },
+              {
+                "username": "Ashok",
+                "tasks": [
+                  {
+                    "tasktype": "Story",
+                    "assignedno": "2"
+                  },
+                  {
+                    "tasktype": "Bug",
+                    "assignedno": "1"
+                  },
+                  {
+                    "tasktype": "Task",
+                    "assignedno": "1"
+                  }
+                ]
+              },
+              {
+                "username": "Raviganesh M",
+                "tasks": [
+                  {
+                    "tasktype": "Story",
+                    "assignedno": "2"
+                  },
+                  {
+                    "tasktype": "Bug",
+                    "assignedno": "5"
+                  },
+                  {
+                    "tasktype": "Task",
+                    "assignedno": "1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]), "reportModel");
       },
 
       getHelper: function () {
@@ -50,6 +157,7 @@ sap.ui.define(
 
         return FlexibleColumnLayoutSemanticHelper.getInstanceFor(oFCL, oSettings);
       }
+
     });
   }
 );

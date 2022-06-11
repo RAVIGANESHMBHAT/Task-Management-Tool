@@ -1,0 +1,25 @@
+<core:FragmentDefinition height="100%" xmlns:core="sap.ui.core"
+                         xmlns="sap.m" xmlns:f="sap.ui.layout.form">
+  <Dialog title="Select Project" contentWidth="40%">
+    <VBox class="sapUiSmallMargin">
+      <f:SimpleForm layout="ColumnLayout" labelSpanL="12" labelSpanM="12"
+                    labelSpanS="12" columnsM="2" columnsL="2" columnsXL="2">
+        <f:content>
+          <Label id="selectProjectLabel" text="Project" labelFor="projectSelectComboBoxId"/>
+          <ComboBox
+            id="projectSelectComboBoxId"
+            change="onProjectComboboxSelectionChange"
+            placeholder="Select Project"
+            items="{ path: 'projectModel>/', sorter: { path: 'projectCode' } }" showSecondaryValues="true">
+            <core:ListItem key="{projectModel>_id}" text="{projectModel>projectCode}"
+                           additionalText="{projectModel>projectName}"/>
+          </ComboBox>
+        </f:content>
+      </f:SimpleForm>
+    </VBox>
+    <buttons>
+      <Button text="Generate Report" press="handleGenerateProjectReport" class="sapUiSizeCompact" type="Emphasized"/>
+      <Button text="Cancel" press="handleSelectProjectDialogClose" class="sapUiSizeCompact"/>
+    </buttons>
+  </Dialog>
+</core:FragmentDefinition>
