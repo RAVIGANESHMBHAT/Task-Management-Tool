@@ -3,12 +3,12 @@ sap.ui.define(
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/routing/History",
     "sap/ui/core/UIComponent",
-    "com/ravi/dissertation/TaskManagementTool/model/formatter"
+    "taskmanagementtool/model/formatter"
   ],
   function (Controller, History, UIComponent, formatter) {
     "use strict";
 
-    return Controller.extend("com.ravi.dissertation.TaskManagementTool.controller.BaseController", {
+    return Controller.extend("taskmanagementtool.controller.BaseController", {
       formatter: formatter,
 
       /**
@@ -65,6 +65,7 @@ sap.ui.define(
           this.getRouter().navTo("appHome", {}, true /*no history*/);
         }
       }
+
     });
   }
 );

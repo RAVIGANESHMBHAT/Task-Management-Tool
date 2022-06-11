@@ -1,31 +1,30 @@
+jQuery.sap.require("taskmanagementtool.controls.BurndownChart");
+
 sap.ui.define([
   "sap/ui/model/json/JSONModel",
-  "com/ravi/dissertation/TaskManagementTool/controller/BaseController",
+  "taskmanagementtool/controller/BaseController",
   "sap/ui/model/Filter",
   "sap/ui/model/FilterOperator",
   "sap/ui/model/Sorter",
   "sap/m/MessageBox",
   "sap/ui/core/Fragment",
-  "com/ravi/dissertation/TaskManagementTool/model/models",
-  "com/ravi/dissertation/TaskManagementTool/model/formatter",
+  "taskmanagementtool/model/models",
+  "taskmanagementtool/model/formatter",
   "sap/m/MessageToast",
   "sap/ui/export/library",
   "sap/ui/export/Spreadsheet",
   "sap/m/SearchField",
+  "taskmanagementtool/helpers/ApiHandlers",
+  "sap/ui/core/BusyIndicator"
 ], function (JSONModel, BaseController, Filter, FilterOperator, Sorter, MessageBox, Fragment, models, formatter, MessageToast,
-             exportLibrary, Spreadsheet, SearchField) {
+             exportLibrary, Spreadsheet, SearchField, ApiHandlers, BusyIndicator) {
   "use strict";
 
   var EdmType = exportLibrary.EdmType;
-  return BaseController.extend("com.ravi.dissertation.TaskManagementTool.controller.Detail", {
+  return BaseController.extend("taskmanagementtool.controller.Detail", {
 
     formatter: formatter,
 
-    /**
-     * Called when a controller is instantiated and its View controls (if available) are already created.
-     * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-     *
-     */
     onInit: function () {
       this.oRouter = this.getOwnerComponent().getRouter();
       this.oRouter.getRoute("detail").attachPatternMatched(this._onUserMatched, this);
@@ -43,10 +42,7 @@ sap.ui.define([
 
       //this.byId("exportBtn").setEnabled(false);
 
-      const oModel = this.getOwnerComponent().getModel("masterTaskManagementModel");
-      oModel.loadData("localService/mockdata/IssuesList.json");
-
-      const oTaskPrio = [
+      const oTaskPriorities = [
         {
           "name": "Low",
           "taskPrioCode": 0,
@@ -64,16 +60,23 @@ sap.ui.define([
         }
       ];
       const oTaskMgntModel = this.getOwnerComponent().getModel("taskManagement");
-      oTaskMgntModel.setProperty("/TaskPriority", oTaskPrio);
+      oTaskMgntModel.setProperty("/TaskPriority", oTaskPriorities);
+
     },
 
-    /**
-     * Method called everytime the route is matched
-     * @public
-     */
+    loadIssuesData: async function () {
+      try {
+        const issues = await ApiHandlers.getAllIssues();
+        const oModel = this.getOwnerComponent().getModel("masterTaskManagementModel");
+        oModel.setData(issues);
+        this.getOwnerComponent().getModel("issuesFilterModel").setProperty("/issuesListCount", issues.length);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+
     _onUserMatched: function (oEvent) {
-      this._userName = oEvent.getParameter("arguments").userName || "User"; //test purpose setting it to User
-      //	this.getView().byId("greetUserId").setText(`Welcome: ${this._userName}`); //ES6 template literal backtick
+      this._userName = oEvent.getParameter("arguments").userName || "User";
       const oFilterBar = this.byId("issuesListFilterBarId");
       var oSearchField = oFilterBar.getBasicSearch();
 
@@ -90,8 +93,18 @@ sap.ui.define([
       if (oBasicSearch) {
         oFilterBar.setBasicSearch(oBasicSearch);
       }
-      sap.ui.core.BusyIndicator.hide(1);
-      this.getModel("issuesFilterModel").setProperty("/issuesListCount", 4);
+      this.loadIssuesData();
+      BusyIndicator.hide(1);
+      this.loadProjectsData();
+    },
+
+    loadProjectsData: function () {
+      const oProjectModel = this.getOwnerComponent().getModel("projectModel");
+      ApiHandlers.handleGetApiCall("https://task-manage-dissertation.herokuapp.com/projects", {}).then((projects) => {
+        oProjectModel.setData(projects);
+      }).catch((err) => {
+        console.log(err);
+      });
     },
 
     handleIssuesListSearch: function (oEvent) {
@@ -186,7 +199,6 @@ sap.ui.define([
         filters: aFilterContent,
         and: true
       }));
-      //oIssuesFilterModel.setProperty("/eventWiseScholarsListCount", oTableBinding.getLength());
       oIssuesFilterModel.setProperty("/issuesListCount", oTableBinding.getLength());
       var oExportDataModel = this.getModel("tableExportModel");
       var aData = (oIssuesTable.getItems() || []).map(function (oItem) {
@@ -274,8 +286,8 @@ sap.ui.define([
         filters: [],
         and: true
       }));
-      var oMasterModel = this.getModel("masterTaskManagementModel");
-      this.getModel("issuesFilterModel").setProperty("/issuesListCount", oIssuesTable.getBinding("items").getLength());
+      const oIssuesFilterModel = this.getModel("issuesFilterModel");
+      oIssuesFilterModel.setProperty("/issuesListCount", oIssuesTable.getBinding("items").getLength());
       var oExportDataModel = this.getModel("tableExportModel");
       var aData = (oIssuesTable.getItems() || []).map(function (oItem) {
         return oItem.getBindingContext("masterTaskManagementModel").getObject();
@@ -284,40 +296,34 @@ sap.ui.define([
       for (var i = 0; i < oFilterItems.length; i++) {
         var oControl = oFilterBar.determineControlByFilterItem(oFilterItems[i]);
         if (oControl) {
-          oControl.setSelectedKeys("");
+          oControl.setSelectedKeys(null);
         }
       }
-      oMasterModel.setProperty("/filterBarData/searchValue", "");
-      oMasterModel.setProperty("/filterBarData/batchFilters", []);
-      oMasterModel.setProperty("/filterBarData/currentRoundFilters", []);
-      oMasterModel.setProperty("/filterBarData/statusFilters", []);
+      oIssuesFilterModel.setProperty("/filterBarData/searchValue", "");
+      oIssuesFilterModel.setProperty("/filterBarData/projectIdFilters", []);
+      oIssuesFilterModel.setProperty("/filterBarData/issueTypeFilters", []);
+      oIssuesFilterModel.setProperty("/filterBarData/priorityFilters", []);
+      oIssuesFilterModel.setProperty("/filterBarData/statusFilters", []);
       oFilterBar.getContent()[0].getContent()[1].setValue("");
     },
 
-    /**
-     * Method called when a list item is clicked
-     * @public
-     * @param {oEvent} - Event data
-     */
     onListItemPress: function (oEvent) {
+      BusyIndicator.show(1);
       //get the context path
-      var taskPath = oEvent.getSource().getBindingContext("masterTaskManagementModel").getPath(),
-        task = taskPath.split("/").slice(-1).pop();
+      var taskPath = oEvent.getSource().getBindingContext("masterTaskManagementModel").getPath();
+
+      const oMasterModel = this.getOwnerComponent().getModel("masterTaskManagementModel");
+      const oSelectedRowData = oMasterModel.getProperty(taskPath);
 
       // route to the detaildetail page for showing the information
       this.oRouter.navTo("detailDetail", {
         layout: sap.f.LayoutType.TwoColumnsMidExpanded,
         userName: this._userName,
-        task: task
+        task: oSelectedRowData._id
 
-      });
+      }, false);
     },
 
-    /**
-     * Method called on search event
-     * @public
-     * @param {oEvent} - Event data
-     */
     onSearch: function (oEvent) {
       var oTableSearchState = [],
         sQuery = oEvent.getParameter("query");
@@ -331,10 +337,6 @@ sap.ui.define([
       this.getView().byId("tasksTable").getBinding("items").filter(oTableSearchState, "Application"); //filter on project code
     },
 
-    /**
-     * Method to open create issue dialog
-     * @public
-     */
     onCreateIssue: function () {
       var oView = this.getView();
 
@@ -345,7 +347,7 @@ sap.ui.define([
       if (!this.createIssueDialog) {
         this.createIssueDialog = Fragment.load({
           id: oView.getId(),
-          name: "com.ravi.dissertation.TaskManagementTool.fragments.CreateIssue",
+          name: "taskmanagementtool.fragments.CreateIssue",
           controller: this //bind controller to fragment for eventing
         }).then(function (oDialog) {
           // connect dialog to the root view of this component (models, lifecycle)
@@ -358,19 +360,15 @@ sap.ui.define([
       });
     },
 
-    /**
-     * Method to open project dialog
-     * @public
-     */
     onPressNewProjectButton: function () {
       var oView = this.getView();
       //create a new model to fetch the data from dialog
-      this.oComponent.setModel(models.createProjectModel(), "createProjectModel");
+      this.getOwnerComponent().setModel(models.createProjectModel(), "createProjectModel");
       // create dialog lazily
       if (!this.createProjectDialog) {
         this.createProjectDialog = Fragment.load({
           id: oView.getId(),
-          name: "com.ravi.dissertation.TaskManagementTool.fragments.CreateProject",
+          name: "taskmanagementtool.fragments.CreateProject",
           controller: this
         }).then(function (oDialog) {
           // connect dialog to the root view of this component (models, lifecycle)
@@ -384,97 +382,177 @@ sap.ui.define([
       });
     },
 
-    /**
-     * Method to close create issue dialog
-     * @public
-     */
     onCloseCreateTaskDialog: function () {
       // note: We don't need to chain to the pDialog promise, since this event-handler
       // is only called from within the loaded dialog itself.
       this.byId("CreateDialog").close();
     },
 
-    /**
-     * Method to close create project dialog
-     * @public
-     */
     onCloseCreateProjectDialog: function () {
       // note: We don't need to chain to the pDialog promise, since this event-handler
       // is only called from within the loaded dialog itself.
       this.byId("CreateProjectDialog").close();
     },
 
-    /**
-     * Method called on save project dialog
-     * @public
-     */
     onProjectSave: function () {
       let createProjectModelData = this.oComponent.getModel("createProjectModel").getData();
       if (createProjectModelData.projectCode.trim() !== "" && createProjectModelData.projectName.trim() !== "") {
-        this._aProjects.push(createProjectModelData);
-        let oldProjects = this.oComponent.getModel("projectModel").getData();
-        oldProjects = oldProjects.concat(this._aProjects);
-        this.oComponent.getModel("projectModel").setData(oldProjects); //this._aProjects
-        this.oComponent.getModel("projectModel").refresh();
-        this.byId("CreateProjectDialog").close();
+
+        const payload = {
+          projectCode: createProjectModelData.projectCode,
+          projectName: createProjectModelData.projectName
+        };
+        ApiHandlers.createProject(payload).then(() => {
+          MessageToast.show("Project created successfully.");
+          this.byId("CreateProjectDialog").close();
+          this.loadProjectsData();
+        }).catch((err) => {
+          MessageToast.show(err.statusText);
+        });
         this.byId("createTaskBtn").setEnabled(true);
-        MessageToast.show("New Project Created Successfully!!");
       } else {
         MessageToast.show("Please enter mandatory fields");
       }
 
     },
 
-    /**
-     * Method called on save issue dialog
-     * @public
-     */
+    onProjectComboboxSelectionChange: function (oEvent) {
+      const selectedProject = oEvent.getSource().getSelectedItem().getAdditionalText();
+      this.projectNameToGenerateReport = selectedProject;
+    },
+
+    onPressShowReportButton: function () {
+      const oThis = this;
+      if (!oThis._oProjectDialog) {
+        sap.ui.core.Fragment.load({
+          id: oThis.getView().getId(),
+          name: "taskmanagementtool.fragments.SelectProject",
+          controller: oThis
+        }).then(function (oDialog) {
+          oThis._oProjectDialog = oDialog;
+          oThis.getView().addDependent(oThis._oProjectDialog);
+          oThis._oProjectDialog.open();
+        }.bind(oThis));
+      } else {
+        oThis.getView().addDependent(oThis._oProjectDialog);
+        oThis._oProjectDialog.open();
+      }
+    },
+
+    onPrintReportDialog: function () {
+      const id = this.getView().getId() + "--customControlReportDialog-scrollCont";
+      if (id) {
+        const ctrlString = "width=800px,height=800px";
+        var newWindow = window.open("", "PrintWindow", ctrlString);
+        var printContents = document.getElementById(id).outerHTML;
+        newWindow.document.write("<div><h5>Project Name: " + this.projectNameToGenerateReport + "</h5><h5> Date: " + new Date() + "</div>" + printContents);
+        newWindow.print();
+        newWindow.close();
+        this._taskReportDialog.close();
+        this._oProjectDialog.close();
+      }
+    },
+
+    oncloseReportDialog: function () {
+      this._taskReportDialog.close();
+    },
+
+    handleGenerateProjectReport: function () {
+      const oThis = this;
+      if (!this._taskReportDialog) {
+        this.createTaskReportDialog = Fragment.load({
+          id: this.getView().getId(),
+          name: "taskmanagementtool.fragments.ProjectReport",
+          controller: this //bind controller to fragment for eventing
+        }).then(function (oDialog) {
+          // connect dialog to the root view of this component (models, lifecycle)
+          oThis._taskReportDialog = oDialog;
+          oThis.getView().addDependent(oDialog);
+          return oDialog;
+        });
+      }
+      this.createTaskReportDialog.then((oDialog) => {
+        oThis.addCustomControl();
+        oDialog.open(); //open dialog
+
+      });
+    },
+
+    addCustomControl: function () {
+      let oBurndowncontainer = this.getView().byId("burndownchartcontainer");
+
+      oBurndowncontainer.removeAllItems(); // remove previous content
+      let oBurndownItem = new taskmanagementtool.BurndownChartItem({
+        username: "{username}",
+        tasks: "{tasks}"
+      });
+      /* new  chart */
+      let oBurndownReport = new taskmanagementtool.BurndownChart({
+        items: {
+          path: "/0/burndown",
+          template: oBurndownItem
+        }
+      });
+
+      let oModel = this.getOwnerComponent().getModel("reportModel");
+      oBurndownReport.setModel(oModel);
+      oBurndowncontainer.addItem(oBurndownReport);
+    },
+
+    handleSelectProjectDialogClose: function () {
+      this._oProjectDialog.close();
+    },
+
     onSaveTask: function () {
       let oView = this.getView();
       let oCreateTaskModel = this.oComponent.getModel("createTaskModel");
-      //since model saves the keys directly from the select control, need name data of these keys.
 
       let oProjectInputItem = oView.byId("create-project").getSelectedItem();
       let oTaskTypeInputItem = oView.byId("create-taskType").getSelectedItem();
       let oCreateAssigneeInputItem = oView.byId("create-assignee").getSelectedItem();
       let oCreatePrioInputItem = oView.byId("create-priority").getSelectedItem();
+      let oDescription = oView.byId("descriptionRichTextEditorId");
 
-      if (oProjectInputItem && oTaskTypeInputItem && oCreateAssigneeInputItem && oCreatePrioInputItem) {
-        //Note: Validation using message manager is pending...
+      if (oProjectInputItem && oTaskTypeInputItem && oCreateAssigneeInputItem && oCreatePrioInputItem && oCreateTaskModel.getProperty("/tasks/taskTitle").trim() !== ""
+        && oCreateTaskModel.getProperty("/tasks/originalEstimate").trim() !== "" && oCreateTaskModel.getProperty("/tasks/taskStatus").trim() !== "") {
         oCreateTaskModel.setProperty("/projectCode", oProjectInputItem.getText());
         oCreateTaskModel.setProperty("/projectName", oProjectInputItem.getText());
         oCreateTaskModel.setProperty("/taskType", oTaskTypeInputItem.getText());
         oCreateTaskModel.setProperty("/taskAssigneeName", oCreateAssigneeInputItem.getText());
+        oCreateTaskModel.setProperty("/taskAssigneeId", oCreateAssigneeInputItem.getKey());
         oCreateTaskModel.setProperty("/taskPriority", oCreatePrioInputItem.getText());
 
         oCreateTaskModel.setProperty("/taskTitle", oCreateTaskModel.getProperty("/tasks/taskTitle"));
+        oCreateTaskModel.setProperty("/taskDescription", oDescription.getValue().substr(3, oDescription.getValue().length - 7));
         oCreateTaskModel.setProperty("/taskStatus", oCreateTaskModel.getProperty("/tasks/taskStatus"));
 
-        let oMasterTaskmgmtModel = this.oComponent.getModel("masterTaskManagementModel");
+        const payload = {
+          "projectCode": oProjectInputItem.getText(),
+          "taskType": oTaskTypeInputItem.getText(),
+          "taskTitle": oCreateTaskModel.getProperty("/tasks/taskTitle"),
+          "taskDescription": oDescription.getValue(),
+          "originalEstimation": oCreateTaskModel.getProperty("/tasks/originalEstimate"),
+          "taskPriority": oCreatePrioInputItem.getText(),
+          "taskAssigneeName": oCreateAssigneeInputItem.getText(),
+          "taskAssigneeId": oCreateAssigneeInputItem.getKey(),
+          "taskStatus": oCreateTaskModel.getProperty("/tasks/taskStatus")
+        };
 
-        this.aMasterData.push(oCreateTaskModel.getData()); //push the newly created issue into the masterTaskManagementModel model
-        let oldTasks = oMasterTaskmgmtModel.getData();
-        oldTasks = oldTasks.concat(this.aMasterData);
-        oMasterTaskmgmtModel.setData(oldTasks);
-        oMasterTaskmgmtModel.refresh(); // refresh model
-        this.getModel("issuesFilterModel").setProperty("/issuesListCount", oldTasks.length);
-        this.aMasterData = [];
+        ApiHandlers.handlePostApiCall("https://task-manage-dissertation.herokuapp.com/issues", payload).then((data) => {
+          this.byId("CreateDialog").close();
+          this.loadIssuesData();
+          MessageToast.show(`New ${oTaskTypeInputItem.getText()} under project code - ${oCreateTaskModel.getProperty("/projectCode")} created successfully`);
+          this.byId("exportBtn").setEnabled(true);
+        }).catch((err) => {
+          MessageBox.information(`${oTaskTypeInputItem.getText()} creation failed.`);
+        });
 
-        //message toast after creation
-        MessageToast.show(`New Task under project code - ${oCreateTaskModel.getProperty("/projectCode")} created successfully`);
-
-        this.byId("exportBtn").setEnabled(true);
-        //end- close dialog
-        this.byId("CreateDialog").close();
       } else {
         MessageBox.show("Please select all the mandatory(*) fields in the dialog");
       }
 
     },
 
-    /**
-     * method called from onExport to get the columns to be dowloaded
-     **/
     createColumnConfig: function () {
       var aCols = [];
 
@@ -513,10 +591,6 @@ sap.ui.define([
       return aCols;
     },
 
-    /**
-     * on Export button click
-     * downloads excel for configure column
-     **/
     onExport: function () {
       var aCols, oRowBinding, oSettings, oSheet, oTable;
 
