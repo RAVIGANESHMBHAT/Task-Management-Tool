@@ -36,6 +36,9 @@ An internal tool for SAP Labs to track and manage the project work which is buil
 ![image](https://user-images.githubusercontent.com/41186067/173200701-3efd5503-9e21-4595-b3c0-930cfefd519e.png)
 
 
+## Note: 
+The application is deployed on the Trial account of SAP BTP. So, once the trial version gets exprired, the application cannot be accessed.
+
 
 
 
