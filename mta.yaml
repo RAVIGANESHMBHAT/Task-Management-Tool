@@ -1,0 +1,96 @@
+_schema-version: "3.2"
+ID: taskmanagementtool
+description: An UI5 application which can be used to track the tasks and the progress
+  of the project development tasks. It also gives an option to download the development
+  progress report as a PDF file.
+version: 0.0.1
+modules:
+  - name: taskmanagementtool-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: taskmanagementtool-destination-service
+        parameters:
+          content-target: true
+      - name: taskmanagementtool-repo-host
+        parameters:
+          service-key:
+            name: taskmanagementtool-repo-host-key
+      - name: taskmanagementtool-uaa
+        parameters:
+          service-key:
+            name: taskmanagementtool-uaa-key
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: taskmanagementtool_html_repo_host
+              ServiceInstanceName: taskmanagementtool-html5-srv
+              ServiceKeyName: taskmanagementtool-repo-host-key
+              sap.cloud.service: taskmanagementtool
+            - Authentication: OAuth2UserTokenExchange
+              Name: taskmanagementtool_uaa
+              ServiceInstanceName: taskmanagementtool-xsuaa-srv
+              ServiceKeyName: taskmanagementtool-uaa-key
+              sap.cloud.service: taskmanagementtool
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
+  - name: taskmanagementtool-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: taskmanagementtool-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - taskmanagementtool.zip
+          name: taskmanagementtool
+          target-path: resources/
+  - name: taskmanagementtool
+    type: html5
+    path: .
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
+resources:
+  - name: taskmanagementtool-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Authentication: NoAuthentication
+                Name: ui5
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://ui5.sap.com
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: taskmanagementtool-destination-service
+      service-plan: lite
+  - name: taskmanagementtool-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: taskmanagementtool-xsuaa-srv
+      service-plan: application
+  - name: taskmanagementtool-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: taskmanagementtool-html5-srv
+      service-plan: app-host
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
