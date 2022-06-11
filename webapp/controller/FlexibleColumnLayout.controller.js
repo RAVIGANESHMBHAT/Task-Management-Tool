@@ -1,12 +1,11 @@
 sap.ui.define([
-  "sap/ui/model/json/JSONModel",
   "sap/ui/core/ResizeHandler",
-  "com/ravi/dissertation/TaskManagementTool/controller/BaseController",
+  "taskmanagementtool/controller/BaseController",
   "sap/f/FlexibleColumnLayout"
-], function (JSONModel, ResizeHandler, BaseController, FlexibleColumnLayout) {
+], function (ResizeHandler, BaseController, FlexibleColumnLayout) {
   "use strict";
 
-  return BaseController.extend("com.ravi.dissertation.TaskManagementTool.controller.FlexibleColumnLayout", {
+  return BaseController.extend("taskmanagementtool.controller.FlexibleColumnLayout", {
     onInit: function () {
       this.oRouter = this.getOwnerComponent().getRouter();
       this.oRouter.attachRouteMatched(this.onRouteMatched, this);
@@ -16,7 +15,7 @@ sap.ui.define([
 
     onBeforeRouteMatched: function (oEvent) {
 
-      var oModel = this.getOwnerComponent().getModel();
+      var oModel = this.getOwnerComponent().getModel("layoutModel");
 
       var sLayout = oEvent.getParameters().arguments.layout;
 
@@ -31,7 +30,7 @@ sap.ui.define([
       // to prevent the view being temporarily shown aside the next view (during the transition to the next route)
       // if the views for both routes do not match semantically
       if (this.currentRouteName === "master") { // last viewed route was master
-        var oLoginView = this.oRouter.getView("com.ravi.dissertation.TaskManagementTool.view.Login");
+        var oLoginView = this.oRouter.getView("taskmanagementtool.view.Login");
         this.getView().byId("fcl").removeBeginColumnPage(oLoginView);
       }
 
@@ -42,7 +41,7 @@ sap.ui.define([
     },
 
     _updateLayout: function (sLayout) {
-      var oModel = this.getOwnerComponent().getModel();
+      var oModel = this.getOwnerComponent().getModel("layoutModel");
 
       // If there is no layout parameter, query for the default level 0 layout (normally OneColumn)
       if (!sLayout) {
@@ -64,9 +63,6 @@ sap.ui.define([
 
       // Save the current route name
       this.currentRouteName = sRouteName;
-      this.currentProduct = oArguments.product;
-      this.currentSupplier = oArguments.supplier;
-      this.currentCategory = oArguments.category;
     },
 
     onStateChanged: function (oEvent) {
@@ -89,14 +85,14 @@ sap.ui.define([
 
     // Update the close/fullscreen buttons visibility
     _updateUIElements: function () {
-      var oModel = this.getOwnerComponent().getModel();
+      var oModel = this.getOwnerComponent().getModel("layoutModel");
       var oUIState = this.getOwnerComponent().getHelper().getCurrentUIState();
       oModel.setData(oUIState, true);
     },
 
     _onResize: function (oEvent) {
       var bPhone = (oEvent.size.width < FlexibleColumnLayout.TABLET_BREAKPOINT);
-      this.getOwnerComponent().getModel().setProperty("/isPhone", bPhone);
+      this.getOwnerComponent().getModel("layoutModel").setProperty("/isPhone", bPhone);
     },
 
     onExit: function () {

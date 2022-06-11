@@ -1,25 +1,21 @@
-<mvc:View displayBlock="true" controllerName="com.ravi.dissertation.TaskManagementTool.controller.Login" height="100%"
-          xmlns="sap.m"
+<mvc:View displayBlock="true" controllerName="taskmanagementtool.controller.Login" height="100%" xmlns="sap.m"
           xmlns:mvc="sap.ui.core.mvc">
   <Page title="Login Form" showHeader="false" class="loginPageBg">
     <content>
       <FlexBox fitContainer="true" direction="Column" alignItems="Center" justifyContent="Center" alignContent="Center">
-        <MessageStrip id="loginUserErrMsgStrip" type="Error" visible="false" showIcon="true"
-                      class="sapUiMediumMarginBottom"/>
+        <MessageStrip id="loginUserErrMsgStrip" type="Error" visible="false" showIcon="true" class="sapUiMediumMarginBottom"/>
         <Input id="userId" placeholder="User ID"/>
         <Input id="pasw" placeholder="Password" type="Password"/>
         <Button width="12rem" text="Login" type="Emphasized" press="onLogin"/>
-        <HBox class="sapUiResponsiveMargin">
-          <Text text="New User?"/>
-          <Link class="sapUiResponsiveMargintext sapUiTinyMarginBegin" text="Click here to register"
-                press="onRegisterUser"/>
+        <HBox class="sapUiResponsiveMargin"><Text text="New User?"/>
+          <Link class="sapUiResponsiveMargintext sapUiTinyMarginBegin" text="Click here to register" press="onRegisterUser"/>
         </HBox>
       </FlexBox>
     </content>
     <footer>
       <Bar>
         <contentLeft>
-          <Text text="© Raviganesh M. All rights reserved"/>
+          <Text text="© 2022 - Raviganesh M. All rights reserved."/>
         </contentLeft>
       </Bar>
     </footer>

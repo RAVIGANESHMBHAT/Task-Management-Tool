@@ -1,16 +1,16 @@
 sap.ui.define([
-  "sap/ui/model/json/JSONModel",
-  "com/ravi/dissertation/TaskManagementTool/controller/BaseController",
+  "taskmanagementtool/controller/BaseController",
   "sap/ui/core/Fragment",
   "sap/m/Popover",
-  "com/ravi/dissertation/TaskManagementTool/model/models",
-  "com/ravi/dissertation/TaskManagementTool/utils/validate",
-  "com/ravi/dissertation/TaskManagementTool/utils/loginPageInit",
-  "sap/m/MessageToast"
-], function (JSONModel, BaseController, Fragment, Popover, models, validate, loginPageInit, MessageToast) {
+  "taskmanagementtool/model/models",
+  "taskmanagementtool/utils/validate",
+  "taskmanagementtool/utils/loginPageInit",
+  "sap/m/MessageToast",
+  "sap/m/MessageBox"
+], function (BaseController, Fragment, Popover, models, validate, loginPageInit, MessageToast, MessageBox) {
   "use strict";
 
-  return BaseController.extend("com.ravi.dissertation.TaskManagementTool.controller.Login", {
+  return BaseController.extend("taskmanagementtool.controller.Login", {
 
     /**
      * Called when a controller is instantiated and its View controls (if available) are already created.
@@ -27,17 +27,13 @@ sap.ui.define([
      * Method called on click of Login button
      * @public
      */
-    onLogin: function () {
+    onLogin: async function () {
       let oView = this.getView();
       let userData = this.oComponent.getModel("userModel").getData();
       let userNameInputValue = oView.byId("userId").getValue().trim();
-      let oValidatedObject = validate.validateUserName(userData, userNameInputValue);
-
-      //user input validations and value states
-      if (oValidatedObject.bErrorExist) {
-        this._setValueStates(oView.byId("userId"), oValidatedObject.sErrorText, "error");
-        return;
-      } else {
+      let passwordInputValue = oView.byId("pasw").getValue().trim();
+      try {
+        let oValidatedObject = await validate.validateUserName(userData, userNameInputValue, passwordInputValue);
         this._setValueStates(oView.byId("userId"), oValidatedObject.sErrorText, "reset");
         //route
         sap.ui.core.BusyIndicator.show(0);
@@ -48,8 +44,11 @@ sap.ui.define([
         location.reload();
 
         oView.byId("userId").setValue(""); //after navigating successfully empty the user id
-      }
 
+      } catch (err) {
+        MessageBox.error(err);
+        this._setValueStates(oView.byId("userId"), err);
+      }
     },
 
     /**
@@ -101,7 +100,7 @@ sap.ui.define([
       if (!this.registerUserDialog) {
         this.registerUserDialog = Fragment.load({
           id: oView.getId(),
-          name: "com.ravi.dissertation.TaskManagementTool.fragments.RegisterUser",
+          name: "taskmanagementtool.fragments.RegisterUser",
           controller: this
         }).then(function (oDialog) {
           // connect dialog to the root view of this component (models, lifecycle)
@@ -188,8 +187,6 @@ sap.ui.define([
       } else {
         this.getView().byId("regUserErrMsgStrip").setVisible(true);
       }
-
     }
-
   });
 });

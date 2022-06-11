@@ -1,0 +1,52 @@
+<core:FragmentDefinition xmlns:core='sap.ui.core' xmlns='sap.m' xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+                         xmlns:u="sap.ui.unified" xmlns:r="sap.ui.richtexteditor">
+  <VBox class="sapUiSmallMargin">
+    <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+      <f:content>
+        <Label text="{i18n>Project}"/>
+        <Select id="edit-project" forceSelection="false" selectedKey="{editTaskManagementModel>/projectCode}" showSecondaryValues="true"
+                items="{ path: 'projectModel>/', sorter: { path: 'projectCode' } }">
+          <core:ListItem key="{projectModel>projectCode}" text="{projectModel>projectCode}" additionalText="{projectModel>projectName}"/>
+        </Select>
+        <Label text="{i18n>IssueType}"/>
+        <Select id="edit-taskType" forceSelection="false" selectedKey="{editTaskManagementModel>/taskType}">
+          <core:ListItem key="Bug" text="Bug" icon="sap-icon://quality-issue"/>
+          <core:ListItem key="Backlog" text="Backlog" icon="sap-icon://activities"/>
+          <core:ListItem key="User Story" text="User Story" icon="sap-icon://work-history"/>
+        </Select>
+      </f:content>
+    </f:SimpleForm>
+    <f:SimpleForm id="SimpleFormEdit" editable="true" layout="ResponsiveGridLayout" labelSpanXL="4" labelSpanL="4" labelSpanM="4"
+                  labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="4" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="2"
+                  singleContainerFullSize="true">
+      <f:content>
+        <Label text="Title"/>
+        <Input id="edit-nameText" value="{editTaskManagementModel>/taskTitle}"/>
+        <Label text="Description"/>
+        <r:RichTextEditor editorType="TinyMCE4" width="400px" height="250px" customToolbar="false" showGroupFont="true" showGroupLink="true"
+                          value="{editTaskManagementModel>/taskDescription}" showGroupInsert="true"/>
+        <Label text="Status"/>
+        <Select id="edit-taskStatus" forceSelection="false" selectedKey="{editTaskManagementModel>/taskStatus}">
+          <core:Item key="Open" text="Open"/>
+          <core:Item key="In Progress" text="In Progress"/>
+          <core:Item key="Blocked" text="Blocked"/>
+          <core:Item key="Completed" text="Completed"/>
+        </Select>
+        <Label text="Total Time Logged"/>
+        <Input id="edit-timeLogged" value="{editTaskManagementModel>/timeLogged}"/>
+        <Label text="Priority"/>
+        <Select id="edit-priority" forceSelection="false" selectedKey="{editTaskManagementModel>/taskPriority}">
+          <core:ListItem key="Low" text="Low" icon="sap-icon://arrow-bottom"/>
+          <core:ListItem key="Medium" text="Medium" icon="sap-icon://circle-task-2"/>
+          <core:ListItem key="High" text="High" icon="sap-icon://arrow-top"/>
+        </Select>
+        <Label text="Assignee"/>
+        <Select id="edit-assignee" forceSelection="false" selectedKey="{editTaskManagementModel>/taskAssigneeId}"
+                items="{ path: 'userModel>/', sorter: { path: 'name' } }" change="updateTaskAssigneeInfo">
+          <core:ListItem key="{userModel>_id}" text="{userModel>name}"/>
+        </Select>
+
+      </f:content>
+    </f:SimpleForm>
+  </VBox>
+</core:FragmentDefinition>
