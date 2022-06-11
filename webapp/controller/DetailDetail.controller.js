@@ -3,39 +3,36 @@ sap.ui.define([
   "sap/base/util/deepExtend",
   "sap/ui/core/syncStyleClass",
   "sap/ui/model/json/JSONModel",
-  "com/ravi/dissertation/TaskManagementTool/controller/BaseController",
+  "taskmanagementtool/controller/BaseController",
   "sap/ui/core/Fragment",
-  "com/ravi/dissertation/TaskManagementTool/model/formatter",
+  "taskmanagementtool/model/formatter",
   "sap/m/MessageBox",
-  "sap/ui/core/format/DateFormat",
   "sap/m/ObjectMarker",
   "sap/m/MessageToast",
   "sap/m/UploadCollectionParameter",
   "sap/m/library",
   "sap/ui/core/format/FileSizeFormat",
-  "sap/ui/Device",
-], function (jQuery, deepExtend, syncStyleClass, JSONModel, BaseController, Fragment, formatter, MessageBox, DateFormat, ObjectMarker,
-             MessageToast, UploadCollectionParameter, MobileLibrary, FileSizeFormat, Device) {
+  "taskmanagementtool/helpers/ApiHandlers",
+  "sap/ui/core/BusyIndicator"
+], function (jQuery, deepExtend, syncStyleClass, JSONModel, BaseController, Fragment, formatter, MessageBox, ObjectMarker,
+             MessageToast, UploadCollectionParameter, MobileLibrary, FileSizeFormat, ApiHandlers, BusyIndicator) {
   "use strict";
 
   var ListMode = MobileLibrary.ListMode,
     ListSeparators = MobileLibrary.ListSeparators;
 
-  return BaseController.extend("com.ravi.dissertation.TaskManagementTool.controller.DetailDetail", {
+  const URLHelper = MobileLibrary.URLHelper;
+
+  return BaseController.extend("taskmanagementtool.controller.DetailDetail", {
     formatter: formatter,
 
-    /**
-     * Called when a controller is instantiated and its View controls (if available) are already created.
-     * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-     *
-     */
     onInit: function () {
       //detaildetail page header buttons
       var oExitButton = this.getView().byId("exitFullScreenBtn"),
         oEnterButton = this.getView().byId("enterFullScreenBtn");
 
       this.oRouter = this.getOwnerComponent().getRouter();
-      this.oModel = this.getOwnerComponent().getModel();
+      this.oModel = this.getOwnerComponent().getModel("layoutModel");
       this.oRouter.getRoute("detailDetail").attachPatternMatched(this._onTaskMatched, this);
 
       //set focus, add event delegate
@@ -52,33 +49,159 @@ sap.ui.define([
 
       //initial form fragments
       this._formFragments = {};
+
+      this.getView().setModel(new JSONModel({
+        "maximumFilenameLength": 55,
+        "maximumFileSize": 1000,
+        "mode": ListMode.SingleSelectMaster,
+        "uploadEnabled": true,
+        "uploadButtonVisible": true,
+        "enableEdit": true,
+        "enableDelete": true,
+        "visibleEdit": true,
+        "visibleDelete": true,
+        "listSeparatorItems": [
+          ListSeparators.All,
+          ListSeparators.None
+        ],
+        "showSeparators": ListSeparators.All,
+        "listModeItems": [
+          {
+            "key": ListMode.SingleSelectMaster,
+            "text": "Single"
+          }, {
+            "key": ListMode.MultiSelect,
+            "text": "Multi"
+          }
+        ]
+      }), "settings");
+
+      this.getView().setModel(new JSONModel({
+        "items": ["jpg", "txt", "ppt", "doc", "xls", "pdf", "png"],
+        "selected": ["jpg", "txt", "ppt", "doc", "xls", "pdf", "png"]
+      }), "fileTypes");
+
     },
 
-    /**
-     * Route function called everytime when detaildetail page is opened
-     * @public
-     */
     _onTaskMatched: function (oEvent) {
       this._task = oEvent.getParameter("arguments").task || "0";
       this._userName = oEvent.getParameter("arguments").userName;
 
-      const oMasterModel = this.getModel("masterTaskManagementModel");
-      const oDetailData = oMasterModel.getProperty(`/${this._task}`);
-
-      this.getModel("detailTaskManagementModel").setData(oDetailData);
-
-
-      // Set the initial form to be the display one
+      //Set the initial form to be the display one
       this._showFormFragment("DisplayTaskDetail");
+
+      const issueId = oEvent.getParameter("arguments").task;
+
+      this.setIssuesData(issueId);
+      this.loadIssueComments(issueId);
+      this.getView().setModel(new JSONModel(), "uploadFileModel");
 
     },
 
-    /**
-     * Factory function called for amrkers
-     * @param {sId} - ID of the control
-     * @param {oContext} - context of markers
-     * @public
-     */
+    setIssuesData: function (issueId) {
+      ApiHandlers.handleGetApiCall(`https://task-manage-dissertation.herokuapp.com/issues/${issueId}`, {}).then((res) => {
+        this.getModel("detailTaskManagementModel").setData(res);
+        BusyIndicator.hide(1);
+      }).catch((err) => {
+        BusyIndicator.hide(1);
+        MessageToast.show(err);
+      });
+    },
+
+    loadIssueComments: function (issueId) {
+      const oDisplayModel = this.getModel("detailTaskManagementModel");
+      ApiHandlers.handleGetApiCall(`https://task-manage-dissertation.herokuapp.com/comments/${issueId}`).then((comments) => {
+        comments.forEach((comment) => {
+          if (comment.from === this._userName) {
+            comment.from = "You";
+          }
+        });
+        oDisplayModel.setProperty("/taskComments", comments);
+      }).catch((err) => {
+        MessageToast.show("Error fetching comments!");
+      });
+
+    },
+
+    handleDeletePress: function () {
+      MessageBox.warning(
+        "You are about to delete this task, Are you sure?", {
+          title: "Warning",
+          actions: [
+            "Delete",
+            sap.m.MessageBox.Action.CANCEL
+          ],
+          emphasizedAction: "Delete",
+          onClose: (oEvent) => {
+            if (oEvent === "Delete") {
+              ApiHandlers.handleDeleteApiCall(`https://task-manage-dissertation.herokuapp.com/issues/${this._task}`, {}).then(() => {
+                MessageToast.show("Task deleted successfully.");
+              }).catch((err) => {
+                MessageBox.error(err);
+              });
+
+              const sNextLayout = this.oModel.getProperty("/actionButtonsInfo/midColumn/closeColumn");
+              this.navigateToView(sNextLayout, "detail");
+            }
+          }
+        }
+      );
+    },
+
+    handleEditPress: function () {
+
+      //Clone the data
+      //	this._otask = Object.assign({}, this.getView().getModel("masterTaskManagementModel").getData()[Number(this._task)]);//shallow copy
+      //this._otask = $.extend(true, {}, this.getView().getModel("masterTaskManagementModel").getData()[Number(this._task)]); //deep copy object if in case canceled the task in between
+
+      const data = {...this.getOwnerComponent().getModel("detailTaskManagementModel").getData()};
+      this.getOwnerComponent().setModel(new JSONModel(data), "editTaskManagementModel");
+
+      this.toggleButtonsAndView(true); //utility function for toggling between fragments
+
+    },
+
+    toggleButtonsAndView: function (bEdit) {
+      var oObjectPage = this.getView().byId("ObjectPageLayout"),
+        bCurrentShowFooterState = oObjectPage.getShowFooter();
+
+      oObjectPage.setShowFooter(!bCurrentShowFooterState);
+
+      var oView = this.getView();
+
+      // Show the appropriate action buttons
+      oView.byId("otbFooter").setVisible(bEdit);
+      oView.byId("editBtn").setVisible(!bEdit);
+      oView.byId("deleteBtn").setVisible(!bEdit);
+      oView.byId("closeButton").setVisible(!bEdit);
+      // Set the right form type
+
+      this.getView().getModel("masterTaskManagementModel").refresh();
+      this._showFormFragment(bEdit ? "ChangeTaskDetail" : "DisplayTaskDetail");
+      // oObjectPage.setSelectedSection(this.getView().byId("GeneralInfo").getId())
+    },
+
+    sendTaskDetailedMail: function () {
+      const oDetailModel = this.getOwnerComponent().getModel("detailTaskManagementModel");
+      const issueTitle = oDetailModel.getProperty("/taskTitle");
+      const assigneeName = oDetailModel.getProperty("/taskAssigneeName");
+      const issueType = oDetailModel.getProperty("/taskType");
+      const issuePriority = oDetailModel.getProperty("/taskPriority");
+      const issueStatus = oDetailModel.getProperty("/taskStatus");
+      const issueDescription = oDetailModel.getProperty("/taskDescription");
+      const originalEstimation = oDetailModel.getProperty("/originalEstimation");
+      const mailSubject = `Task Management Tool: Info on the ${issueType}, "${issueTitle}"`;
+      const mailBody = `Hello, Find the below details on the ${issueType}, "${issueTitle}".\n
+                Issue Description: ${issueDescription}\n
+                Assignee Name: ${assigneeName}\n
+                Issue Priority: ${issuePriority}\n
+                Issue Status: ${issueStatus}\n
+                Original Estimation: ${originalEstimation}\n
+                Find more on the ticket here, ${location.href}\n\n
+                Regards,\n Task Management Tool Team.`;
+      URLHelper.triggerEmail("", mailSubject, mailBody, false, false, true);
+    },
+
     createObjectMarker: function (sId, oContext) {
       var mSettings = null;
 
@@ -91,12 +214,6 @@ sap.ui.define([
       return new ObjectMarker(sId, mSettings);
     },
 
-    /**
-     * formatter function to format file size
-     * @param {sValue}
-     * @public
-     * @return {String}
-     */
     formatAttribute: function (sValue) {
       if (jQuery.isNumeric(sValue)) {
         return FileSizeFormat.getInstance({
@@ -109,8 +226,37 @@ sap.ui.define([
       }
     },
 
+    onChange: function (oEvent) {
+      var oUploadCollection = oEvent.getSource();
+      // Header Token
+      var oCustomerHeaderToken = new UploadCollectionParameter({
+        name: "x-csrf-token",
+        value: "securityTokenFromModel"
+      });
+      oUploadCollection.addHeaderParameter(oCustomerHeaderToken);
+    },
+
+    onFileDeleted: function (oEvent) {
+      this.deleteItemById(oEvent.getParameter("documentId"));
+      MessageToast.show("File deleted successfully.");
+    },
+
+    deleteItemById: function (sItemToDeleteId) {
+      var oData = this.getView().getModel("uploadFileModel").getData();
+      var aItems = deepExtend({}, oData).items;
+      jQuery.each(aItems, function (index) {
+        if (aItems[index] && aItems[index].documentId === sItemToDeleteId) {
+          aItems.splice(index, 1);
+        }
+      });
+      this.getView().getModel("uploadFileModel").setData({
+        "items": aItems
+      });
+      this.byId("attachmentTitle").setText(this.getAttachmentTitleText());
+    },
+
     deleteMultipleItems: function (aItemsToDelete) {
-      var oData = this.getView().byId("UploadCollection").getModel().getData();
+      var oData = this.getView().getModel("uploadFileModel").getData();
       var nItemsToDelete = aItemsToDelete.length;
       var aItems = deepExtend({}, oData).items;
       var i = 0;
@@ -123,94 +269,90 @@ sap.ui.define([
           }
         }
       });
-      this.getView().byId("UploadCollection").getModel().setData({
+      this.getView().getModel("uploadFileModel").setData({
         "items": aItems
       });
       this.getView().byId("attachmentTitle").setText(this.getAttachmentTitleText());
     },
 
-    /**
-     * Method called to check if file name length exceeded
-     * @private
-     */
     onFilenameLengthExceed: function () {
-      MessageToast.show("FilenameLengthExceed event triggered.");
+      MessageBox.error("Filename Length Exceed.");
     },
-    /**
-     * Method called to check if file size length exceeded
-     * @private
-     */
+
     onFileSizeExceed: function () {
-      MessageToast.show("FileSizeExceed event triggered.");
+      MessageBox.error("File Size Exceed.");
     },
 
-    /**
-     * Method called on file type missmatch
-     * @private
-     */
     onTypeMissmatch: function () {
-      MessageToast.show("TypeMissmatch event triggered.");
+      MessageBox.error("File type missmatch.");
     },
 
-    /**
-     * Method called on upload complete
-     * @param {oEvent} - Event data
-     * @private
-     */
-    onUploadComplete: function (oEvent) {
-      var oUploadCollection = this.getView().byId("UploadCollection");
-      var oModel = this.getView().getModel("masterTaskManagementModel");
-      var oTasks = this.getView().getModel("masterTaskManagementModel").getProperty("/");
-      var oData = oModel.getProperty("/" + this._task);
-      var aEntries = oData.tasks.taskAttachments.items;
-      var sFileName = oEvent.getParameter("files")[0].fileName;
-      var sUrl = "file:///Users/i341283/Desktop" + sFileName;
+    onFileRenamed: function (oEvent) {
+      var oData = this.getView().getModel("uploadFileModel").getData();
+      var aItems = deepExtend({}, oData).items;
+      var sDocumentId = oEvent.getParameter("documentId");
+      jQuery.each(aItems, function (index) {
+        if (aItems[index] && aItems[index].documentId === sDocumentId) {
+          aItems[index].fileName = oEvent.getParameter("item").getFileName();
+        }
+      });
+      this.getView().getModel("uploadFileModel").setData({
+        "items": aItems
+      });
+      MessageToast.show("File renamed successfully.");
+    },
 
-      //add the recent uploaded file details into the model
-      aEntries.unshift({ //unshift to add model data into the first array index
+    onUploadComplete: function (oEvent) {
+      var oData = this.getView().getModel("uploadFileModel").getData();
+
+      if (!oData.items) oData.items = [];
+      oData.items.unshift({
         "documentId": Date.now().toString(), // generate Id,
         "fileName": oEvent.getParameter("files")[0].fileName,
         "mimeType": "",
         "thumbnailUrl": "",
-        "url": sUrl,
-        "attributes": [{
-          "title": "Uploaded By",
-          "text": oData.tasks.taskAssigneeName,
-          "active": false
-        }, {
-          "title": "Uploaded On",
-          "text": new Date().toLocaleDateString(),
-          "active": false
-        }, {
-          "title": "File Size",
-          "text": "505000",
-          "active": false
-        }],
-        "statuses": [{
-          "title": "",
-          "text": "",
-          "state": "None"
-        }],
-        "markers": [{}],
+        "url": "",
+        "attributes": [
+          {
+            "title": "Uploaded By",
+            "text": "You",
+            "active": false
+          },
+          {
+            "title": "Uploaded On",
+            "text": new Date().toLocaleDateString(),
+            "active": false
+          },
+          {
+            "title": "File Size",
+            "text": "505000",
+            "active": false
+          }
+        ],
+        "statuses": [
+          {
+            "title": "",
+            "text": "",
+            "state": "None"
+          }
+        ],
+        "markers": [
+          {}
+        ],
         "selected": false
       });
-      oModel.setProperty("/", oTasks); //update the model
-      oModel.refresh();
+
+      this.getView().getModel("uploadFileModel").refresh();
 
       // Sets the text to the label
-      this.getView().byId("attachmentTitle").setText(this.getAttachmentTitleText());
+      this.byId("attachmentTitle").setText(this.getAttachmentTitleText());
 
       // delay the success message for to notice onChange message
       setTimeout(function () {
-        MessageToast.show("UploadComplete event triggered.");
+        MessageToast.show("Upload sccessful.");
       }, 4000);
     },
 
-    /**
-     * Method called on upload complete
-     * @param {oEvent} - Event data
-     * @public
-     */
     onBeforeUploadStarts: function (oEvent) {
       // Header Slug
       var oCustomerHeaderSlug = new UploadCollectionParameter({
@@ -218,44 +360,103 @@ sap.ui.define([
         value: oEvent.getParameter("fileName")
       });
       oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
-      MessageToast.show("BeforeUploadStarts event triggered.");
+      //MessageToast.show("BeforeUploadStarts event triggered.");
     },
 
-    /**
-     * Method called on file type change
-     * @param {oEvent} - Event data
-     * @public
-     */
     onFileTypeChange: function (oEvent) {
       this.getView().byId("UploadCollection").setFileType(oEvent.getSource().getSelectedKeys());
     },
 
-    /**
-     * Method called getting the attachment text
-     * @param {oEvent} - Event data
-     * @public
-     */
+    onSelectAllPress: function (oEvent) {
+      var oUploadCollection = this.byId("UploadCollection");
+      if (!oEvent.getSource().getPressed()) {
+        this.deselectAllItems(oUploadCollection);
+        oEvent.getSource().setPressed(false);
+        oEvent.getSource().setText("Select all");
+      } else {
+        this.deselectAllItems(oUploadCollection);
+        oUploadCollection.selectAll();
+        oEvent.getSource().setPressed(true);
+        oEvent.getSource().setText("Deselect all");
+      }
+      this.onSelectionChange(oEvent);
+    },
+
+    onDeleteSelectedItems: function () {
+      var aSelectedItems = this.byId("UploadCollection").getSelectedItems();
+      this.deleteMultipleItems(aSelectedItems);
+      if (this.byId("UploadCollection").getSelectedItems().length < 1) {
+        this.byId("selectAllButton").setPressed(false);
+        this.byId("selectAllButton").setText("Select all");
+      }
+      MessageToast.show("Item deleted successfully.");
+    },
+
+    deselectAllItems: function (oUploadCollection) {
+      var aItems = oUploadCollection.getItems();
+      for (var i = 0; i < aItems.length; i++) {
+        oUploadCollection.setSelectedItem(aItems[i], false);
+      }
+    },
+
     getAttachmentTitleText: function () {
       var aItems = this.getView().byId("UploadCollection").getItems();
       return "Uploaded (" + aItems.length + ")";
     },
 
-    /**
-     * Called when the View has been rendered (so its HTML is part of the document).
-     * Post-rendering manipulations of the HTML could be done here.
-     * This hook is the same one that SAPUI5 controls get after being rendered.
-     */
+    onSelectionChange: function () {
+      var oUploadCollection = this.byId("UploadCollection");
+      // Only it is enabled if there is a selected item in multi-selection mode
+      if (oUploadCollection.getMode() === ListMode.MultiSelect) {
+        if (oUploadCollection.getSelectedItems().length > 0) {
+          this.byId("deleteSelectedButton").setEnabled(true);
+        } else {
+          this.byId("deleteSelectedButton").setEnabled(false);
+        }
+      }
+    },
+
+    onAttributePress: function (oEvent) {
+      MessageToast.show("Attribute press - " + oEvent.getSource().getTitle() + ": " + oEvent.getSource().getText());
+    },
+
+    onMarkerPress: function (oEvent) {
+      MessageToast.show("Marker press - " + oEvent.getSource().getType());
+    },
+
+    onOpenAppSettings: function (oEvent) {
+      var oView = this.getView();
+
+      if (!this._pSettingsDialog) {
+        this._pSettingsDialog = Fragment.load({
+          id: oView.getId(),
+          name: "sap.m.sample.UploadCollection.AppSettings",
+          controller: this
+        }).then(function (oSettingsDialog) {
+          oView.addDependent(oSettingsDialog);
+          return oSettingsDialog;
+        });
+      }
+
+      this._pSettingsDialog.then(function (oSettingsDialog) {
+        syncStyleClass("sapUiSizeCompact", oView, oSettingsDialog);
+        oSettingsDialog.setContentWidth("42rem");
+        oSettingsDialog.open();
+      });
+    },
+
+    onDialogCloseButton: function () {
+      this._pSettingsDialog.then(function (oSettingsDialog) {
+        oSettingsDialog.close();
+      });
+    },
+
     onAfterRendering: function () {
 
       //hide footer
-      this.getView().byId("otbFooter").setVisible(false); //hide the footer initially
+      //this.getView().byId("otbFooter").setVisible(false); //hide the footer initially
     },
 
-    /**
-     * Utitlity method to toggle the buttons during edit and display mode
-     * @param{Boolean} bEdit - edit true or false
-     * @public
-     */
     _toggleButtonsAndView: function (bEdit) {
       var oView = this.getView();
 
@@ -266,14 +467,10 @@ sap.ui.define([
       oView.byId("closeButton").setVisible(!bEdit);
       // Set the right form type
 
-      this.getView().getModel("masterTaskManagementModel").refresh();
+      this.getView().getModel("masterTaskManagementModel")?.refresh();
       this._showFormFragment(bEdit ? "ChangeTaskDetail" : "DisplayTaskDetail");
     },
 
-    /**
-     * Method called on click of cancel button in the footer
-     * @public
-     */
     handleCancelPress: function () {
 
       //Restore the data
@@ -303,91 +500,64 @@ sap.ui.define([
 
     },
 
-    /**
-     * Method called to save the edit page details into the model
-     * @public
-     */
     handleSavePress: function () {
+      const payload = this.getOwnerComponent().getModel("editTaskManagementModel").getData();
+      const issueId = payload._id;
+      delete payload._id;
+      delete payload.createdAt;
+      delete payload.updatedAt;
 
-      let oView = this.getView();
-      let oMasterTaskManagementModel = this.getView().getModel("masterTaskManagementModel");
-      oMasterTaskManagementModel.setProperty("/" + this._task + "/projectCode", oView.byId("edit-project").getSelectedItem().getText());
-      oMasterTaskManagementModel.setProperty("/" + this._task + "/projectName", oView.byId("edit-project").getSelectedItem().getText());
-      oMasterTaskManagementModel.setProperty("/" + this._task + "/tasks/taskTypeName", oView.byId("edit-taskType").getSelectedItem().getText());
-      oMasterTaskManagementModel.setProperty("/" + this._task + "/tasks/taskAssigneeName", oView.byId("edit-assignee").getSelectedItem().getText());
-      oMasterTaskManagementModel.setProperty("/" + this._task + "/tasks/taskPriorityName", oView.byId("edit-priority").getSelectedItem().getText());
-      oMasterTaskManagementModel.setProperty("/" + this._task + "/tasks/taskStatus", oView.byId("edit-taskStatus").getSelectedItem().getText());
-      this.getView().getModel("masterTaskManagementModel").refresh();
-      this._toggleButtonsAndView(false); // toggle button after save
-      //	this.handleFullScreen();
-
-    },
-
-    /**
-     * Method called on click of send button in feed input list
-     * @public
-     */
-    onPost: function (oEvent) {
-      let oMasterTaskManagementModel = this.getView().getModel("masterTaskManagementModel");
-      var oFormat = DateFormat.getDateTimeInstance({
-        style: "medium"
+      ApiHandlers.handlePutApiCall(`https://task-manage-dissertation.herokuapp.com/issues/${issueId}`, payload).then((data) => {
+        this.setIssuesData(data._id);
+        this.loadIssueComments(data._id);
+        MessageToast.show("Issue has been updated successfully.");
+        this.toggleButtonsAndView(false);
+      }).catch((err) => {
+        MessageBox.error("Issue cannot be updated at the moment.");
       });
-      var sProcessor = oMasterTaskManagementModel.getProperty("/" + this._task + "/tasks/taskAssigneeName");
-      var oDate = new Date();
-      var sDate = oFormat.format(oDate);
-      // create new entry
-      var sValue = oEvent.getParameter("value");
-      var oEntry = {
-        Author: sProcessor,
-        AuthorPicUrl: "",
-        Type: "Reply",
-        Date: "" + sDate,
-        Text: sValue
-      };
 
-      // update model
-      var oModel = this.getView().getModel("masterTaskManagementModel");
-      var oTasks = this.getView().getModel("masterTaskManagementModel").getProperty("/");
-      var oData = oModel.getProperty("/" + this._task);
-      var aEntries = oData.tasks.taskComments;
-      aEntries.unshift(oEntry); //add the comment to first index of array
-      oModel.setProperty("/", oTasks);
-      oModel.refresh();
     },
 
-    /**
-     * Method to handle full screen button on object page for fcl
-     * @public
-     */
+    updateTaskAssigneeInfo: function (oEvent) {
+      const sSelectedItem = oEvent.getSource().getSelectedItem().getText();
+      this.getOwnerComponent().getModel("editTaskManagementModel").setProperty("/taskAssigneeName", sSelectedItem);
+    },
+
+    onPost: function (oEvent) {
+      const aWebUrlItems = window.location.href.split("/");
+      const sIssueID = aWebUrlItems[aWebUrlItems.length - 1], sUsername = aWebUrlItems[aWebUrlItems.length - 2];
+      const sMessage = oEvent.getParameter("value");
+      const payload = {
+        from: sUsername,
+        message: sMessage,
+        issueId: sIssueID,
+        time: new Date()
+      };
+      const oThis = this;
+      ApiHandlers.handlePostApiCall("https://task-manage-dissertation.herokuapp.com/comments", payload).then((comment) => {
+        oThis.loadIssueComments(comment.issueId);
+      }).catch((err) => {
+        MessageToast.show(err);
+      });
+    },
+
     handleFullScreen: function () {
       this.bFocusFullScreenButton = true;
       var sNextLayout = this.oModel.getProperty("/actionButtonsInfo/midColumn/fullScreen");
       this.navigateToView(sNextLayout, "detailDetail");
     },
 
-    /**
-     * Method to handle exit screen button on object page for fcl
-     * @public
-     */
     handleExitFullScreen: function () {
       this.bFocusFullScreenButton = true;
       var sNextLayout = this.oModel.getProperty("/actionButtonsInfo/midColumn/exitFullScreen");
       this.navigateToView(sNextLayout, "detailDetail");
     },
 
-    /**
-     * Method to handle close button on object page for fcl
-     * @public
-     */
     handleClose: function () {
       var sNextLayout = this.oModel.getProperty("/actionButtonsInfo/midColumn/closeColumn");
       this.navigateToView(sNextLayout, "detail");
     },
 
-    /**
-     * Method called  from fcl related function and on object delete
-     * @public
-     */
     navigateToView: function (sNextLayout, sNextView) {
       this.oRouter.navTo(sNextView, {
         layout: sNextLayout,
@@ -396,11 +566,6 @@ sap.ui.define([
       });
     },
 
-    /**
-     * Method to load the fragment based on mode
-     * @param {sFragmentName} - Name of the fragment. Ex: display or change
-     * @public
-     */
     _getFormFragment: function (sFragmentName) {
       var pFormFragment = this._formFragments[sFragmentName],
         oView = this.getView();
@@ -408,7 +573,7 @@ sap.ui.define([
       if (!pFormFragment) {
         pFormFragment = Fragment.load({
           id: oView.getId(),
-          name: "com.ravi.dissertation.TaskManagementTool.fragments." + sFragmentName,
+          name: "taskmanagementtool.fragments." + sFragmentName,
           controller: this
         });
         this._formFragments[sFragmentName] = pFormFragment;
@@ -417,11 +582,6 @@ sap.ui.define([
       return pFormFragment;
     },
 
-    /**
-     * Method to show/add the fragment onto the object page basic information section based on mode
-     * @param {sFragmentName} - Name of the fragment. Ex: display or change
-     * @public
-     */
     _showFormFragment: function (sFragmentName) {
       var oPage = this.getView().byId("GeneralInfo");
       var that = this;
@@ -436,6 +596,8 @@ sap.ui.define([
             }.bind(that)
           });
         }
+      }).then(function () {
+        that.getView().byId("ObjectPageLayout").setSelectedSection(that.getView().byId("GeneralInfo").getId());
       });
     }
   });

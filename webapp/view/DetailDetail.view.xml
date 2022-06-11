@@ -1,6 +1,6 @@
 <mvc:View displayBlock="true" controllerName="taskmanagementtool.controller.DetailDetail"
           height="95%" xmlns:mvc="sap.ui.core.mvc"
-          xmlns="sap.uxap" xmlns:m="sap.m" xmlns:f="sap.f" xmlns:form="sap.ui.layout.form">
+          xmlns="sap.uxap" xmlns:m="sap.m">
   <!-- <m:Page> -->
   <ObjectPageLayout id="ObjectPageLayout" showTitleInHeaderContent="false" alwaysShowContentHeader="true"
                     preserveHeaderStateOnScroll="true"
@@ -88,8 +88,8 @@
                                   uploadButtonInvisible="{=!${settings>/uploadButtonVisible}}" mode="{settings>/mode}">
                 <m:Toolbar>
                   <m:OverflowToolbar id="myId">
-                    <m:Title id="attachmentTitle"></m:Title>
-                    <m:ToolbarSpacer></m:ToolbarSpacer>
+                    <m:Title id="attachmentTitle"/>
+                    <m:ToolbarSpacer/>
                     <m:Button id="deleteSelectedButton" text="Delete" press="onDeleteSelectedItems" enabled="false"
                               visible="false" type="Transparent"/>
                     <m:ToggleButton id="selectAllButton" text="Select all" press="onSelectAllPress" enabled="false"
@@ -145,7 +145,6 @@
           </ObjectPageSubSection>
         </subSections>
       </ObjectPageSection>
-
     </sections>
 
     <footer>
