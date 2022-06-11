@@ -2,11 +2,11 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/Device"], function (JSONMo
   "use strict";
 
   return {
-    // createDeviceModel: function () {
-    //   var oModel = new JSONModel(Device);
-    //   oModel.setDefaultBindingMode("OneWay");
-    //   return oModel;
-    // },
+    createDeviceModel: function () {
+      var oModel = new JSONModel(Device);
+      oModel.setDefaultBindingMode("OneWay");
+      return oModel;
+    },
 
     loadUserModel: function () {
       let oUserModel = {
@@ -21,9 +21,14 @@ sap.ui.define(["sap/ui/model/json/JSONModel", "sap/ui/Device"], function (JSONMo
     },
 
     createProjectModel: function () {
+      // let oProjectModel = {
+      //   projectId: Date.now().toString(),
+      //   generatedProjectNo: Math.floor(Math.random() * 90000) + 10000,
+      //   projectCode: "",
+      //   projectName: "",
+      // }
+
       let oProjectModel = {
-        projectId: Date.now().toString(),
-        generatedProjectNo: Math.floor(Math.random() * 90000) + 10000,
         projectCode: "",
         projectName: "",
       };

@@ -25,5 +25,9 @@ sap.ui.define([], function () {
       }
     },
 
+    formatDate: function (date) {
+      return new Date(date).toString().substr(0, 24);
+    }
+
   };
 });
