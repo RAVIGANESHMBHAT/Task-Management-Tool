@@ -1,40 +1,21 @@
 {
-  "_version": "1.21.0",
+  "_version": "1.40.0",
   "sap.app": {
-    "id": "com.ravi.dissertation.TaskManagementTool",
+    "id": "taskmanagementtool",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
-      "version": "1.0.0"
+      "version": "0.0.1"
     },
     "title": "{{appTitle}}",
     "description": "{{appDescription}}",
-    "dataSources": {
-      "taskManagementRemote": {
-        "uri": "/here/goes/your/serviceUrl/",
-        "type": "OData",
-        "settings": {
-          "odataVersion": "2.0",
-          "localUri": "localService/metadata.xml"
-        }
-      },
-      "userModel": {
-        "uri": "localService/mockdata/Users.json",
-        "type": "JSON"
-      },
-      "reportModel": {
-        "uri": "localService/mockdata/UserBurndownData.json",
-        "type": "JSON"
-      },
-      "taskTypesModel": {
-        "uri": "localService/mockdata/TaskType.json",
-        "type": "JSON"
-      },
-      "projectModel": {
-        "uri": "localService/mockdata/Projects.json",
-        "type": "JSON"
-      }
-    }
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap-ux/fiori-freestyle-writer:basic",
+      "version": "0.11.13",
+      "toolsId": "4cbdcf60-1ac8-4747-967e-ff2e796f3a08"
+    },
+    "dataSources": {}
   },
   "sap.ui": {
     "technology": "UI5",
@@ -54,18 +35,17 @@
   },
   "sap.ui5": {
     "flexEnabled": true,
-    "rootView": {
-      "viewName": "com.ravi.dissertation.TaskManagementTool.view.FlexibleColumnLayout",
-      "type": "XML",
-      "async": true,
-      "id": "fcl"
-    },
     "dependencies": {
-      "minUI5Version": "1.60.0",
+      "minUI5Version": "1.102.1",
       "libs": {
-        "sap.ui.core": {},
         "sap.m": {},
-        "sap.ui.layout": {}
+        "sap.ui.core": {},
+        "sap.f": {},
+        "sap.suite.ui.generic.template": {},
+        "sap.ui.comp": {},
+        "sap.ui.generic.app": {},
+        "sap.ui.table": {},
+        "sap.ushell": {}
       }
     },
     "contentDensities": {
@@ -76,25 +56,17 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.ravi.dissertation.TaskManagementTool.i18n.i18n"
+          "bundleName": "taskmanagementtool.i18n.i18n"
         }
-      },
-      "userModel": {
-        "type": "sap.ui.model.json.JSONModel",
-        "dataSource": "userModel"
-      },
-      "reportModel": {
-        "type": "sap.ui.model.json.JSONModel",
-        "dataSource": "reportModel"
       },
       "taskManagement": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "taskTypesModel": {
-        "dataSource": "taskTypesModel"
+        "type": "sap.ui.model.json.JSONModel"
       },
       "projectModel": {
-        "dataSource": "projectModel"
+        "type": "sap.ui.model.json.JSONModel"
       },
       "masterTaskManagementModel": {
         "type": "sap.ui.model.json.JSONModel"
@@ -126,10 +98,11 @@
       "config": {
         "routerClass": "sap.m.routing.Router",
         "viewType": "XML",
-        "viewPath": "com.ravi.dissertation.TaskManagementTool.view",
-        "controlId": "fcl",
+        "async": true,
+        "viewPath": "taskmanagementtool.view",
         "controlAggregation": "pages",
-        "async": true
+        "controlId": "fcl",
+        "clearControlAggregation": false
       },
       "routes": [
         {
@@ -169,6 +142,16 @@
           "controlAggregation": "midColumnPages"
         }
       }
+    },
+    "rootView": {
+      "viewName": "taskmanagementtool.view.FlexibleColumnLayout",
+      "type": "XML",
+      "async": true,
+      "id": "fcl"
     }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "taskmanagementtool"
   }
 }
