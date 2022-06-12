@@ -2,14 +2,16 @@
   <Dialog id="registerUserDialog" title="New User Registration">
     <VBox class="sapUiSmallMargin">
       <MessageStrip id="regUserErrMsgStrip" type="Error" visible="false"
-                    text="User Name exists/empty or Password is invalid" showIcon="true"
+                    text="There are some missing/invalid information." showIcon="true"
                     class="sapUiMediumMarginBottom"/>
       <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
         <f:content>
-          <Label text="{i18n>Name}"/>
+          <Label text="{i18n>Name}" required="true"/>
           <Input id="idUserName" value="{registerUserModel>/name}"/>
-          <Label text="{i18n>Password}"/>
-          <Input value="{registerUserModel>/password}" type="Password" liveChange="validatePassword"
+          <Label text="Email" required="true"/>
+          <Input id="idEmail" value="{registerUserModel>/email}" liveChange="validateEmail"/>
+          <Label text="{i18n>Password}" required="true"/>
+          <Input id="idPassword" value="{registerUserModel>/password}" type="Password" liveChange="validatePassword"
                  valueLiveUpdate="true"/>
         </f:content>
       </f:SimpleForm>

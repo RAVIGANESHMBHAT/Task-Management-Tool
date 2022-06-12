@@ -6,8 +6,9 @@ sap.ui.define([
   "taskmanagementtool/utils/validate",
   "taskmanagementtool/utils/loginPageInit",
   "sap/m/MessageToast",
-  "sap/m/MessageBox"
-], function (BaseController, Fragment, Popover, models, validate, loginPageInit, MessageToast, MessageBox) {
+  "sap/m/MessageBox",
+  "taskmanagementtool/helpers/ApiHandlers",
+], function (BaseController, Fragment, Popover, models, validate, loginPageInit, MessageToast, MessageBox, ApiHandlers) {
   "use strict";
 
   return BaseController.extend("taskmanagementtool.controller.Login", {
@@ -44,6 +45,7 @@ sap.ui.define([
         location.reload();
 
         oView.byId("userId").setValue(""); //after navigating successfully empty the user id
+        oView.byId("pasw").setValue("");
 
       } catch (err) {
         MessageBox.error(err);
@@ -126,6 +128,17 @@ sap.ui.define([
       this.getView().byId("regUserErrMsgStrip").setVisible(false);
     },
 
+    validateEmail: function (oEvent) {
+      var value = oEvent.getSource().getValue();
+      if (value.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)) {
+        oEvent.getSource().setValueState("Success");
+        this.bEmailValidationResult = true;
+      } else {
+        oEvent.getSource().setValueState("Error");
+        this.bEmailValidationResult = false;
+      }
+    },
+
     /**
      * Method to validate password field in new user registration dialog
      * @public
@@ -136,7 +149,7 @@ sap.ui.define([
       oPopover.openBy(oEvent.getSource());
       let sNewValue = oEvent.getSource().getValue();
       let sUserName = this.getView().byId("idUserName").getValue();
-      this.bFinalValidationResult = true;
+      this.bPasswordValidationResult = true;
 
       //function expression for updating the popup content on every live change event
       let setStatus = (oObjStatus, bResult, bInvertResult) => {
@@ -149,7 +162,7 @@ sap.ui.define([
         } else {
           oObjStatus.setState("Error");
           oObjStatus.setIcon("sap-icon://decline");
-          this.bFinalValidationResult = false;
+          this.bPasswordValidationResult = false;
         }
       };
 
@@ -170,23 +183,28 @@ sap.ui.define([
     onCreateUser: function () {
       let oView = this.getView();
       let userNameInputValue = oView.byId("idUserName").getValue();
+      let emailInputValue = oView.byId("idEmail").getValue();
+      let passwordInputValue = oView.byId("idPassword").getValue();
       oView.byId("regUserErrMsgStrip").setVisible(false);
-      let aUserData = this.oComponent.getModel("userModel").getData();
-      let bUserExists = aUserData.some(user =>
-        (user.name).toLowerCase() === userNameInputValue.toLowerCase()); //check if the already exists while registration
 
-      // check for validations and perform registration of an user accordingly
-      if (this.bFinalValidationResult && oView.byId("idUserName") !== "" && !bUserExists) {
-        let aUserData = this.oComponent.getModel("userModel").getData();
-        let aRegisteredUserData = this.oComponent.getModel("registerUserModel").getData();
-        aUserData.push(aRegisteredUserData);
-        this.oComponent.getModel("userModel").setData(aUserData);
-        this.oComponent.getModel("userModel").refresh();
-        MessageToast.show("User Registered Successfully");
+      if (this.bPasswordValidationResult && this.bEmailValidationResult && userNameInputValue.trim() !== "" && emailInputValue.trim() !== "" && passwordInputValue.trim() !== "") {
+        const payload = {
+          "name": userNameInputValue,
+          "email": emailInputValue,
+          "password": passwordInputValue,
+          "role": "None"
+        };
+
+        ApiHandlers.handlePostApiCall("https://task-manage-dissertation.herokuapp.com/users", payload).then((data) => {
+          MessageToast.show("User registered successfully.");
+        }).catch((err) => {
+          MessageToast.show("Error creating user!!");
+        });
         this.byId("registerUserDialog").close();
       } else {
         this.getView().byId("regUserErrMsgStrip").setVisible(true);
       }
     }
+
   });
 });
