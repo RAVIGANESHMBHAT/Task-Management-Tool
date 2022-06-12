@@ -525,7 +525,7 @@ sap.ui.define([
 
     onPost: function (oEvent) {
       const aWebUrlItems = window.location.href.split("/");
-      const sIssueID = aWebUrlItems[aWebUrlItems.length - 1], sUsername = aWebUrlItems[aWebUrlItems.length - 2];
+      const sIssueID = aWebUrlItems[aWebUrlItems.length - 1], sUsername = this._userName;
       const sMessage = oEvent.getParameter("value");
       const payload = {
         from: sUsername,
